@@ -1,0 +1,23 @@
+Package: fleeteffSim
+Type: Package
+Title: Vehicle Efficiency Standard Simulator  (Title Case)
+Version: 0.1.0
+Author: Lachlan Fox
+Maintainer: Lachlan Fox <lachlan.fox@grattaninstitute.edu.au>
+Description: This package simulates a fleetwide vehicle efficiency standard for
+    the Australian light vehicle fleet. It calculates the expected lowest cost path
+    compliance costs, fuel savings, and emissions savings when compared to a 
+    business as usual scenario. 
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
+Config/testthat/edition: 3
+Imports: 
+    crayon,
+    data.table,
+    tibble,
+    dplyr,
+    tidyr,
+    readr,
+    testthat
