@@ -15,7 +15,3 @@ A value of the fuel consumed
 \description{
 petrol_co2_to_fuel
 }
-\examples{
-
-
-}

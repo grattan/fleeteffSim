@@ -20,4 +20,7 @@ Imports:
     dplyr,
     tidyr,
     readr,
-    testthat
+    testthat,
+    magrittr
+Depends: 
+    R (>= 2.10)

@@ -3,10 +3,6 @@
 
 #importing dummy data for tests, generated in the R script "test_data_upgrade_selector.R"
 
-test_cc <- read_rds("data-raw/test_data/test_cc.rds")
-test_fleet <- read_rds("data-raw/test_data/test_fleet.rds")
-
-
 test_that("Upgrade selector selects the most cost effective upgrade from dummy data", {
 
   expect_equal(

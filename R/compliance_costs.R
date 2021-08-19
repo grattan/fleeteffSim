@@ -15,10 +15,15 @@
 #' applied to meet the specified target in each year
 #' @export
 #'
-#' @examples
 #'
-#'
-#'
+
+
+globalVariables(c("fleet", "target", "cost_curves", "passenger"))
+
+
+
+
+
 compliance_costs <- function(.fleet = fleet,
                              .target = target,
                              .cost_curves = cost_curves,

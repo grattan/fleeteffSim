@@ -21,9 +21,19 @@
 #' over it' lifespan
 #' @export
 #'
-#' @examples
 #'
-#'
+
+
+globalVariables(c("compliant_fleet", "km_travelled", "fuel_prices",
+                  "electricity_prices", "energy_consumption", "energy_intensity",
+                  "year", "fuel_type", "diesel_share", "purchase_year", "price",
+                  "vehicle_type", "age", "current_emissions", "total_emissions",
+                  "electric_applied"))
+
+
+
+
+
 benefit_model <- function(.fleet = compliant_fleet,
                           .km_travelled = km_travelled,
                           .fuel_prices = fuel_prices,

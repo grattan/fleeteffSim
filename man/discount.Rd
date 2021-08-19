@@ -17,7 +17,3 @@ A discounted dataframe
 \description{
 Discount function
 }
-\examples{
-
-
-}

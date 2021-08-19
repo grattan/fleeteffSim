@@ -10,9 +10,17 @@
 #' @return A \code{tibble} containing updated cost curves, where the costs of assumed 'existing' technology is 0
 #' @export
 #'
-#' @examples
 #'
 #'
+
+
+globalVariables(c("estimate", "existing_tech", "weighted_emissions",
+                  "proportion_left", "incr_reduction", "difference"))
+
+
+
+
+
 add_existing_technology <- function(.type,
                                     .existing_tech,
                                     .estimate,

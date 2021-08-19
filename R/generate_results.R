@@ -8,9 +8,9 @@
 #' @return A discounted dataframe
 #' @export
 #'
-#' @examples
 #'
-#'
+
+
 discount <- function(data, rate) {
 
   i <- 1
@@ -36,9 +36,12 @@ discount <- function(data, rate) {
 #' @return summarised results
 #' @export
 #'
-#' @examples
 #'
-#'
+
+
+globalVariables(c("vehicle_age", "cost", "fuel_cost", "additional_cost",
+                  "emissions_savings", "fuel_cost_savings"))
+
 generate_results <- function(bau_benefits,
                              target_benefits){
 
