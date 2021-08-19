@@ -311,7 +311,7 @@ benefit_model <- function(.fleet = compliant_fleet,
       vehicle_age == 0 ~ cost,
       vehicle_age != 0 ~ 0
     ))
-
+#ajsndjansdj
 
   return(all_fleet)
 
