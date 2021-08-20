@@ -1,5 +1,5 @@
 
-#' Title
+#' Benefit model run
 #'
 #' @param .fleet The output of 'compliance_cost' function, with a compliant simulated fleet
 #' @param .km_travelled The assumed km travelled for each vehicle segment and vehicle age

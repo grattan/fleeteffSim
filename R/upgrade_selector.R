@@ -85,6 +85,7 @@ select_upgrade <- function(.this_year_fleet,
         filter(vehicle_group == .vehicle_group) %>%
         filter(tech_pkg_no %in% c(100, .tech_pkg_allowed)) %>%
 
+
         #we've also got to adjust the cost curves file to reflect the new incremental
         #price of ev's (because the ev price is compared to base car, we need to decrease the
         #cost if we've already put on other upgrade)
@@ -93,7 +94,7 @@ select_upgrade <- function(.this_year_fleet,
           type == "ev" , (incr_cost - .current_cost),
           type != "ev" , incr_cost))
 
-
+      #print(.this_car_curves)
 
       #now we want to work out which option gives the best carbon reduction /$
       .this_car_curves <- .this_car_curves %>%
