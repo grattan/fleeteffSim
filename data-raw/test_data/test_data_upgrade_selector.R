@@ -9,7 +9,7 @@ test_fleet <- read_rds("data-raw/model-inputs/projected_fleet_in-10.rds")
 test_cc <- test_cc %>%
   #pick a somewhat random year
   filter(year == 2023,
-         estimate == "icct_estimate")
+         estimate == "central")
 
 test_fleet <- test_fleet %>%
   #again choosing 2023
