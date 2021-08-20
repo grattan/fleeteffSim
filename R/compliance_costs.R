@@ -21,20 +21,27 @@
 #'
 
 
-globalVariables(c("fleet", "target", "cost_curves", "passenger"))
+globalVariables(c("fleet", "target", "cost_curves", "passenger",
+                  "targets_and_bau", "target_type"))
 
 
 
 
 
 compliance_costs <- function(.fleet = fleet,
-                             .target = target,
+                             .target_file = targets_and_bau,
+                             .target_scenario = "target_central",
                              .cost_curves = cost_curves,
-                             .estimate = "icct_estimate",
+                             .estimate = "central",
                              .suv_existing_tech = 20,
                              .passenger_existing_tech = 13,
                              .lcv_existing_tech = 15,
                              .run_to_year = 2050) {
+
+
+  #selecting the target required (or BAU)
+  .target <- .target_file %>%
+    filter(target_type == .target_scenario)
 
 
   #in a given year starting at 2021 (we'll be looping through years)
