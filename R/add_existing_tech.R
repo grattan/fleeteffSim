@@ -1,6 +1,8 @@
-
-
-#' add_existing_tech
+#' Add existing technology
+#'
+#' @name add_existing_technology
+#'
+#' @description Add existing technology
 #'
 #' @param .type The type of vehicle (ie. passenger, suv) to be applied to
 #' @param .existing_tech The assumed level of existing technology, as a percentage reduction of co2 since 2008 average
@@ -8,24 +10,17 @@
 #' @param .cost_curves The cost curves used in the overall model run
 #'
 #' @return A \code{tibble} containing updated cost curves, where the costs of assumed 'existing' technology is 0
+#'
 #' @export
 #'
-#'
-#'
-
 
 globalVariables(c("estimate", "existing_tech", "weighted_emissions",
                   "proportion_left", "incr_reduction", "difference"))
-
-
-
-
 
 add_existing_technology <- function(.type,
                                     .existing_tech,
                                     .estimate,
                                     .cost_curves) {
-
 
   .cost_curves <- .cost_curves %>%
     filter(vehicle_group == .type,
