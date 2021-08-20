@@ -1,5 +1,8 @@
-
-#' Benefit model run
+#' Benefit model
+#'
+#' @name benefit_model
+#'
+#' @description Benefit model
 #'
 #' @param .fleet The output of 'compliance_cost' function, with a compliant simulated fleet
 #' @param .km_travelled The assumed km travelled for each vehicle segment and vehicle age
@@ -19,8 +22,8 @@
 #'
 #' @return A \code{tibble} including the fuel, emissions, costs for each vehicle in the simulated fleet
 #' over it' lifespan
-#' @export
 #'
+#' @export
 #'
 
 
