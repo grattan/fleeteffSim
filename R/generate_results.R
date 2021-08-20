@@ -1,13 +1,15 @@
-
-
 #' Discount function
+#'
+#' @name discount
+#'
+#' @description Apply a discount rate to a supplied dataframe
 #'
 #' @param data Input data
 #' @param rate Discount rate to be applied
 #'
 #' @return A discounted dataframe
-#' @export
 #'
+#' @export
 #'
 
 
@@ -26,25 +28,26 @@ discount <- function(data, rate) {
 
 
 
-
-
-#' generate_results
+#' Generate results
+#'
+#' @name generate_results
+#'
+#' @description Generate results
+#'
 #'
 #' @param bau_benefits the bau_benefits data
 #' @param target_benefits the target benefits data
 #'
 #' @return summarised results
+#'
 #' @export
 #'
-#'
-
 
 globalVariables(c("vehicle_age", "cost", "fuel_cost", "additional_cost",
                   "emissions_savings", "fuel_cost_savings"))
 
 generate_results <- function(bau_benefits,
-                             target_benefits){
-
+                             target_benefits) {
 
   #pulling the data together from th bau and target summary
   bau_summary <- bau_benefits %>%

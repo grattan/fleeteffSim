@@ -8,4 +8,8 @@
 \description{
 Simulate fleetwide efficiency standard
 }
+\author{
+\strong{Maintainer}: Lachie Fox \email{lachlan.fox@grattaninstitute.edu.au}
+
+}
 \keyword{internal}

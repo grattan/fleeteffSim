@@ -1,27 +1,22 @@
-
-#' upgrade_selector
+#' Upgrade selector
+#'
+#' @name select_upgrade
+#'
+#' @description Select an upgrade
+#'
 #'
 #' @param .this_year_fleet A \code{tibble} containing the simulated fleet of vehicle sales for the iterated year
 #' @param .this_year_curves A \code{tibble} containing the cost curves for vehicles sold in the iterated year
 #'
 #' @return A \code{tibble} with the selected most cost effective upgrade to apply to the fleet
 #'
-#' @importFrom data.table fcase
 #'
 #' @export
 #'
-#'
-#'
-
 
 globalVariables(c("tech_pkg_applied", "id", "scenario", "vehicle_group",
                   "tech_pkg_no", "type", "incr_cost", "incr_reduction",
                   "dollar_per_gram_reduced"))
-
-
-
-
-
 
 select_upgrade <- function(.this_year_fleet,
                                .this_year_curves) {
@@ -134,8 +129,3 @@ select_upgrade <- function(.this_year_fleet,
   return(.tech_options)
 
 }
-
-
-
-
-

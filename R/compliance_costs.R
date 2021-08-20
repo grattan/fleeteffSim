@@ -1,6 +1,8 @@
-
-
-#' compliance_costs
+#' Compliance costs
+#'
+#' @name compliance_costs
+#'
+#' @description Compliance costs
 #'
 #' @param .fleet The simulated fleet of new vehicle sales until 2050
 #' @param .target The input target of a fleetwide efficiency standard to be evaluated or a business as usual trajectory
@@ -13,6 +15,7 @@
 #'
 #' @return A \code{tibble} with a 'compliant' vehicle fleet, where technology upgrades have been
 #' applied to meet the specified target in each year
+#'
 #' @export
 #'
 #'

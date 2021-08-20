@@ -1,8 +1,11 @@
-
-#' fleet_creator
+#' Fleet creator
 #'
-#' Creates a fleet of simulated vehicle sales until 2050, characterised by vehicle
+#' @name fleet_creator
+#'
+#' @description Creates a fleet of simulated vehicle sales until 2050, characterised by vehicle
 #' segment and emissions.
+#'
+#'
 #'
 #' @param .i_cars The number of cars sold in the base year (2021) in the simulated fleet
 #' @param .i_passenger_share The share of passenger vehicles in the base year
@@ -17,15 +20,11 @@
 #' @param .digits Used for rounding
 #'
 #' @return a \code{tibble} with each row representing a vehicle.
+#'
 #' @export
-#'
-#'
 #'
 
 globalVariables(c("passenger", "lcv", "suv", "total", "share", "base_emissions"))
-
-
-
 
 fleet_creator <- function(.i_cars = 10, # (each car represents 10% of new vehicle sales)
                           #shares from: https://www.ntc.gov.au/sites/default/files/assets/files/Carbon-dioxide-emissions-intensity-for-new-Australian-light-vehicles-2019.pdf
