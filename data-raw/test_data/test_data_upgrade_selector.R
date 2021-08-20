@@ -49,7 +49,7 @@ test_fleet$current_emissions[9] <- 80
 #applied to the passenger vehicle with a tech pkg of 0. The test will ensure that is the
 #case
 
-usethis::use_data(test_cc, test_fleet, internal = TRUE)
+usethis::use_data(test_cc, test_fleet, internal = TRUE, overwrite = TRUE)
 
 
 
