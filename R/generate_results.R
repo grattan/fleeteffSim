@@ -46,6 +46,8 @@ discount <- function(data, rate) {
 globalVariables(c("vehicle_age", "cost", "fuel_cost", "additional_cost",
                   "emissions_savings", "fuel_cost_savings"))
 
+
+
 generate_results <- function(bau_benefits,
                              target_benefits) {
 

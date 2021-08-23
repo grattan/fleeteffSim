@@ -54,8 +54,7 @@ benefit_model <- function(.fleet,
                           .premium_95 = 0.15,
                           .premium_98 = 0.05) {
 
-  message("fuel types")
-  tic()
+
   #now we have our fleet, we're first going to also characterise it by fuel type (diesel/petrol/premium)
   #this is currently quite slow and inefficient, but it works it attributing the right
   #portiong of each year's vehicle with either diesel or premium fuels, characterised by
@@ -163,11 +162,6 @@ benefit_model <- function(.fleet,
     arrange(year, id) %>%
     select(-diesel_share)
 
-  toc()
-
-  message("big loop")
-  tic()
-
 
   #now into the other stuff
 
@@ -252,50 +246,19 @@ benefit_model <- function(.fleet,
   }
 
 
-  toc()
-
-
-  message("remaining")
-
-  #The rest we can do outside of the loop I'm fairly sure, just by grouping by year etc.
 
   #now we want to assign the km driven for each vehicle based on it's type and
   #vehicle age. We're going to have to loop over the data to do this.
 
-  #initialising the column
-  all_fleet <- all_fleet %>%
-    mutate(km_driven = 0)
-
   #now assigning the distance driven based on the vehicles age and vehicle type.
   #were assuming driving behaviour stays the same in all years.
+  km_travelled <- km_travelled %>%
+    rename("vehicle_age" = age,
+           "km_driven" = km_travelled)
 
-  message("loop in remaining")
-  tic()
+  all_fleet <- inner_join(all_fleet, km_travelled)
 
 
-  #no determining how far each vehicle has travelled based on age/type
-  i <- 1
-  while (i <= nrow(all_fleet)) {
-
-    #for this iteration the characteristics are
-    .age <- all_fleet$vehicle_age[i]
-    .type <- all_fleet$vehicle_group[i]
-
-    #based on this the km driven are:
-    .km <- .km_travelled %>%
-      filter(age == .age,
-             vehicle_type == .type)
-
-    #putting this value in the fleet dataset
-    all_fleet$km_driven[i] = .km$km_travelled[1]
-
-    i <- i + 1
-  }
-
-  toc()
-
-  message("bit after that")
-  tic()
   #now creating a column for fuel consumption
   all_fleet <- all_fleet %>%
     #first creating a real world emissions column where we adjust for the 'gap
@@ -337,9 +300,8 @@ benefit_model <- function(.fleet,
       vehicle_age == 0 ~ cost,
       vehicle_age != 0 ~ 0
     ))
-#ajsndjansdj
 
-  toc()
+
 
   return(all_fleet)
 
