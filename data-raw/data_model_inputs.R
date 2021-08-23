@@ -29,7 +29,10 @@ electricity_prices <- read_rds("data-raw/model-inputs/energy_price_forecast.rds"
 energy_consumption <- read_rds("data-raw/model-inputs/ev_energy_consumption.rds")
 energy_intensity <- read_xlsx("data-raw/AEMO/emissions-intensity-grid.xlsx",
                               sheet = "step_change") %>%
-                              clean_names()
+                              clean_names() %>%
+                              complete(year = (2051:2060)) %>%
+                              arrange(year) %>%
+                              na.locf()
 
 #km travelled
 km_travelled <- read_rds("data-raw/model-inputs/km_traveled.rds")

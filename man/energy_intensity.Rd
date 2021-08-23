@@ -8,7 +8,9 @@
 A \code{tibble} object with 3 variables:
 \describe{
 \item{\code{year}}{The year the value applies to}
-\item{\code{ei_g_wh}}{The energy intensity of the grid, in grams carbon dioxide per watt hour}
+\item{\code{ei_g_wh}}{The energy intensity of the grid, in grams carbon dioxide per watt hour from 2021
+to 2060. This is a linear extrapolation of the AEMO "step change" scenario, where it is assumed that
+assumed that net zero is reached by 2050}
 }
 }
 \usage{
