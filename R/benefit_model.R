@@ -35,9 +35,7 @@ globalVariables(c("compliant_fleet", "km_travelled", "fuel_prices",
 
 
 
-
-
-benefit_model <- function(.fleet = compliant_fleet,
+benefit_model <- function(.fleet,
                           .km_travelled = km_travelled,
                           .fuel_prices = fuel_prices,
                           .electricity_prices = electricity_prices,
@@ -56,8 +54,8 @@ benefit_model <- function(.fleet = compliant_fleet,
                           .premium_95 = 0.15,
                           .premium_98 = 0.05) {
 
-
-
+  message("fuel types")
+  tic()
   #now we have our fleet, we're first going to also characterise it by fuel type (diesel/petrol/premium)
   #this is currently quite slow and inefficient, but it works it attributing the right
   #portiong of each year's vehicle with either diesel or premium fuels, characterised by
@@ -75,6 +73,7 @@ benefit_model <- function(.fleet = compliant_fleet,
     filter(electric_applied == FALSE)
   n_ice_fleet <- .fleet %>%
     filter(electric_applied == TRUE)
+
 
   #now assigning a proportion of the fleet to each type
   j <- 1
@@ -164,7 +163,10 @@ benefit_model <- function(.fleet = compliant_fleet,
     arrange(year, id) %>%
     select(-diesel_share)
 
+  toc()
 
+  message("big loop")
+  tic()
 
 
   #now into the other stuff
@@ -250,7 +252,10 @@ benefit_model <- function(.fleet = compliant_fleet,
   }
 
 
+  toc()
 
+
+  message("remaining")
 
   #The rest we can do outside of the loop I'm fairly sure, just by grouping by year etc.
 
@@ -264,6 +269,11 @@ benefit_model <- function(.fleet = compliant_fleet,
   #now assigning the distance driven based on the vehicles age and vehicle type.
   #were assuming driving behaviour stays the same in all years.
 
+  message("loop in remaining")
+  tic()
+
+
+  #no determining how far each vehicle has travelled based on age/type
   i <- 1
   while (i <= nrow(all_fleet)) {
 
@@ -282,7 +292,10 @@ benefit_model <- function(.fleet = compliant_fleet,
     i <- i + 1
   }
 
+  toc()
 
+  message("bit after that")
+  tic()
   #now creating a column for fuel consumption
   all_fleet <- all_fleet %>%
     #first creating a real world emissions column where we adjust for the 'gap
@@ -325,6 +338,8 @@ benefit_model <- function(.fleet = compliant_fleet,
       vehicle_age != 0 ~ 0
     ))
 #ajsndjansdj
+
+  toc()
 
   return(all_fleet)
 

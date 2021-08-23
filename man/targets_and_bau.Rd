@@ -9,7 +9,7 @@ A \code{tibble} object with 3 variables:
 \describe{
 \item{\code{year}}{The year the emissions applies to}
 \item{\code{target_type}}{The type of target or scenario. bau refers to the business as usual scenario. Other
-scenarios ("central", "ambitious", "linear" refer to different targets that may be tested.}
+scenarios ("central", "ambitious", "linear" refer to different targets that may be tested).}
 }
 }
 \usage{

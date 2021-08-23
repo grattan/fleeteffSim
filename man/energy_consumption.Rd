@@ -8,7 +8,7 @@
 A \code{tibble} object with 3 variables:
 \describe{
 \item{\code{vehicle_type}}{The energy price scenario to be assumed. Options are "central",
-"low_price", "high_price", and "off_peak"}
+ "low_price", "high_price", and "off_peak"}
 \item{\code{year}}{The year the value applies to}
 \item{\code{energy_consumption}}{The assumed energy consumption (kW per kilometre)}
 }

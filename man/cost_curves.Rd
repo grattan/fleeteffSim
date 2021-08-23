@@ -11,7 +11,6 @@
 cost_curves
 }
 \description{
-The costs and efficiency improvements associated with technology upgrades available to vehicles.
-Derived from US EPA cost curves as part of the OMEGA model.
+The costs and efficiency improvements associated with technology upgrades available to vehicles. Derived from US EPA cost curves as part of the OMEGA model
 }
 \keyword{datasets}

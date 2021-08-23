@@ -145,9 +145,9 @@ compliance_costs <- function(.fleet = fleet,
     }
 
     message(bold$green("Target reached for year ", .year))
-    message(yellow$bold(.year, "average emission value is ", mean(.this_year_fleet$current_emissions)))
-    message(yellow$bold(.year, "average cost increase was $", round(mean(.this_year_fleet$cost), digits = 2)))
-    message(yellow$bold("Moving to next year"))
+    message(blue$bold(.year, "average emission value is ", round(mean(.this_year_fleet$current_emissions), digits = 2)))
+    message(blue$bold("The average cost increase per vehicle was $", round(mean(.this_year_fleet$cost), digits = 2)))
+    message(cyan$bold("Moving to next year"))
 
     .year <- .year + 1
 
