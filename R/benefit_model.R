@@ -254,7 +254,8 @@ benefit_model <- function(.fleet,
   #were assuming driving behaviour stays the same in all years.
   km_travelled <- km_travelled %>%
     rename("vehicle_age" = age,
-           "km_driven" = km_travelled)
+           "km_driven" = km_travelled,
+           "vehicle_group" = vehicle_type)
 
   all_fleet <- inner_join(all_fleet, km_travelled)
 
