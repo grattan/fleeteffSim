@@ -257,7 +257,8 @@ benefit_model <- function(.fleet,
            "km_driven" = km_travelled,
            "vehicle_group" = vehicle_type)
 
-  all_fleet <- inner_join(all_fleet, km_travelled)
+  all_fleet <- inner_join(all_fleet, km_travelled,
+                          by = c("vehicle_group", "vehicle_age"))
 
 
   #now creating a column for fuel consumption
