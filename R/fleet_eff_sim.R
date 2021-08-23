@@ -1,7 +1,18 @@
 
 #' Fleet efficiency simulation
 #'
-#' @param .in_fleet The simulated 'fleet' to be run through the model
+#' @name fleet_eff_sim
+#'
+#' @description This function runs the fleet efficiency simulation model over a simulated fleet of new vehicle sales between now
+#' and 2050. It calculates the costs and benefits of a specified emissions target compared to the business as usual scenario.
+#'
+#' @param .fleet_creator Default is TRUE. Specifies whether the \code{fleet_creator} will be used to generate a simulated
+#' fleet of vehicle sales. If FALSE, the fleet specified by \code{.input_fleet} will be used instead.
+#' @param .in_cars Default is 100. The number of cars in the base year of the simulated fleet. To be used by \code{fleet_creator} to produce
+#' a simulated fleet over all year. Although a larger simulated fleet sample (> 100) can be used, this is more time intensive and
+#' is unlikely to yield significantly different results. For example, the BCR in simulations with \code{.in_cars = 100} and \code{.in cars = 400} differ by
+#' ~1\% overall.
+#' @param .input_fleet The simulated 'fleet' to be run through the model as input by the user
 #' @param .in_target_file Defaults to \code{targets_and_bau}. The file from where target and bau scenarios are drawn.
 #' @param .in_target_scenario Defaults to "target_central". The assumed target trajectory scenario of a fleet standard from those contained in
 #' \code{.in_target_file}
@@ -43,8 +54,10 @@
 globalVariables()
 
 
-fleet_eff_sim<- function(#cost model inputs
-                        .in_fleet,
+fleet_eff_sim <- function(#cost model inputs
+                        .fleet_creator = TRUE,
+                        .in_cars = 100,
+                        .input_fleet,
                         .in_target_file = targets_and_bau,
                         .in_target_scenario = "target_central",
                         .in_bau_scenario = "bau",
@@ -74,6 +87,17 @@ fleet_eff_sim<- function(#cost model inputs
                         #15% 95oct and 5% 98, but there is not hard data on this
                         .in_premium_95 = 0.15,
                         .in_premium_98 = 0.05) {
+
+
+  #first checking whether the fleet creator is to be used or if the user is inputting
+  #their own fleet
+
+  if (.fleet_creator == TRUE) {
+    .in_fleet <- fleet_creator(.i_cars = .in_cars)
+  } else {
+    .in_fleet <- .input_fleet
+  }
+
 
   #first running the costs side of model for the target
   .target_compliant <- compliance_costs(.fleet = .in_fleet,
