@@ -58,261 +58,173 @@ packages_2025 <- read_xls("data-raw/epa/2025-technology-packages.xls") %>%
 
 
 
-# Cost curve function all types =================================================
+# Cost curve function ----------------------------------------------------------
 
-#the cost curves functioncalculates the
+#this function creates simplified cost curves for three vehicle types (passenger,
+#suv, lcv), by aggregating the EPA cost curve datasets.
 
-cost_curves <- function(.packages, .vehicle_type = (1:19),
-                        .passenger = 149,
-                        .suv = 184,
-                        .lcv = 226) {
+#to aggregate the data, weighted averages are taken between the 19 relevant vehicle categories
+#determined by the US EPA. These categories were mapped to the Austraian vehicle fleet
+#and the assumed proportions of each is available in `vehicle_classes`. Averages
+#are weighted by sales volumes.
+
+#However, because we are averaging across packages now they no longer represent
+#specific technologies - simply different curves for efficiency improvements and associated costs.
+
+cost_curves <- function(.packages_1 = packages_2021,
+                        .packages_2 = packages_2025,
+                        .vehicle_type = (1:19),
+                        .vehicle_classes = vehicle_classes,
+                        #this `simplified` argument just strips some of the
+                        #columns we don't need any more from the output - if all columns are wanted
+                        #change it to false
+                        .simplified = TRUE) {
 
 
-  .packages <- .packages %>%
-    filter(vech_type_no %in% (1:19)) %>%
+  #first for the first set of packages
+  .packages_1 <- .packages_1 %>%
     filter(vech_type_no %in% .vehicle_type) %>%
     mutate(vehicle_group = case_when(
-          vech_type_no %in% c(1,2,4,6) ~ "passenger",
-          vech_type_no %in% c(7,8) ~ "suv",
-          vech_type_no %in% c(11,13) ~ "lcv",
-          vech_type_no %in% c(3,5,9,10,12,14,15,16,17,18,19) ~ "unused")) %>%
-    mutate(baseline_emissions = case_when(
-          vehicle_group == "passenger" ~ .passenger,
-          vehicle_group == "suv" ~ .suv,
-          vehicle_group == "lcv" ~ .lcv)) %>%
+          vech_type_no %in% c(1, 2, 4, 6) ~ "passenger",
+          vech_type_no %in% c(7, 8) ~ "suv",
+          vech_type_no %in% c(11, 13) ~ "lcv",
+          vech_type_no %in% c(3, 5, 9, 10, 12, 14, 15, 16, 17, 18, 19) ~ "unused"))  #,
+         # aie = aie * cap,
+         # incr_cost = incr_cost * aie)
 
-
-    #just initialising these columns
-    mutate(total_cost = 0,
-           total_emissions = 0)
-
-    #starting from vech type 1, this rolls through each tech package number.
-    i <- 1
-    while (i <= nrow(.packages)) {
-
-      #at tech pakage = 1, we make the incremental cost the cap x the cost.
-      if (.packages$tech_pkg_no[i] == 1) {
-        .packages$total_cost[i] <- .packages$incr_cost[i] * .packages$cap[i]
-          #print(.packages$tech_pkg_no[i])
-          i <- i + 1
-      }
-
-
-      #beyond tech package 1, we add the increment cost x cap to the previous total cost to
-      #give what is basically a running total
-      else {
-        .packages$total_cost[i] <- .packages$incr_cost[i] * .packages$cap[i] + .packages$total_cost[i-1]
-          #print(.packages$tech_pkg_no[i])
-          i <- i + 1
-      }
-    }
-
-
-    #doing the same pattern for the incremental improvement
-    i <- 1
-    while (i <= nrow(.packages)) {
-      if (.packages$tech_pkg_no[i] == 1) {
-        .packages$total_emissions[i] <- .packages$baseline_emissions[i] * (1 - (.packages$cap[i] * .packages$aie[i]))
-        #print(.packages$tech_pkg_no[i])
-        i <- i + 1
-      }
-
-      else {
-        .packages$total_emissions[i] <- .packages$total_emissions[i-1] * (1 - (.packages$cap[i] * .packages$aie[i]))
-        #print(.packages$tech_pkg_no[i])
-        i <- i + 1
-      }
-    }
-
-   .packages <- .packages %>%
+   .cost_curves_1 <- .packages_1 %>%
      #just adjusting the costs first for inflation (1.12) and converting to
      #aus dollars (1.34)
-      mutate(total_cost_aus = total_cost * 1.12 * 1.34,
-             incr_cost = incr_cost * 1.12*1.34)
+      mutate(incr_cost = incr_cost * 1.12 * 1.34)
 
-  return(.packages)
+
+   #and the second
+   .packages_2 <- .packages_2 %>%
+     filter(vech_type_no %in% (1:19)) %>%
+     filter(vech_type_no %in% .vehicle_type) %>%
+     mutate(vehicle_group = case_when(
+       vech_type_no %in% c(1,2,4,6) ~ "passenger",
+       vech_type_no %in% c(7,8) ~ "suv",
+       vech_type_no %in% c(11,13) ~ "lcv",
+       vech_type_no %in% c(3,5,9,10,12,14,15,16,17,18,19) ~ "unused"))#,
+     #  aie = aie * cap,
+    #   incr_cost = incr_cost * aie)
+
+   .cost_curves_2 <- .packages_2 %>%
+     #just adjusting the costs first for inflation (1.12) and converting to
+     #aus dollars (1.34)
+     mutate(incr_cost = incr_cost * 1.12 * 1.34)
+
+
+   .cost_curves <- bind_rows(.cost_curves_1, .cost_curves_2)
+
+
+   #adding weights from vehicle classes to data, and dropping unneeded cols
+   .cost_curves <- left_join(.cost_curves, .vehicle_classes)
+
+   if (.simplified == TRUE) {
+     .cost_curves <- .cost_curves %>%
+       select(vech_type_no, tech_pkg_no, cap, aie, incr_cost, year,
+              vehicle_group, weight)
+   }
+
+
+   .cost_curves <- .cost_curves %>%
+     filter(vehicle_group != "unused") %>%
+     group_by(vehicle_group, tech_pkg_no, year) %>%
+     summarise(aie =  weighted.mean(x = aie, w = weight),
+               incr_cost =  weighted.mean(x = incr_cost, w = weight),
+               cap = weighted.mean(x = cap, w = weight)) %>%
+     ungroup() %>%
+
+   #using the `cap` to adjust the costs and improvements that can begained from
+   #each technology
+     mutate(aie = aie * cap,
+            incr_cost = incr_cost * cap) %>%
+     select(-cap)
+
+
+   #adding the point 0
+
+   initial <- .vehicle_classes %>%
+     select(vehicle_group) %>%
+     group_by(vehicle_group) %>%
+     mutate(incr_cost = 0,
+            tech_pkg_no = 0,
+            year21 = 2021,
+            year25 = 2025,
+            aie = 0) %>%
+     pivot_longer(c("year21", "year25"),
+                  values_to = "year") %>%
+     select(-name) %>%
+     mutate(year = as.character(year))
+
+   .cost_curves <- rbind(.cost_curves, initial) %>%
+     rename("incr_reduction" = aie)
+
+  return(.cost_curves)
+
 }
 
 
-
-#WEIGHTED AVERAGE CURVES BY CLASS (PASSENGER, SUV, LCV) ========================
-
-#this function is designed to be used on the output of the cost_curves function
-#it takes that output, and generates cost curves that simplify the vehicle classes
-#into those we have defined (suv/lcv/passenger).
-
-#It does this by using weighted averages of the different epa classes, using this
-#to average the incremental improvements and costs. However, because we are averaging across
-#packages now they no longer represent specific technologies - simply different curves
-#for efficiency improvements.
-
-simplify_curves <- function(.cost_curves,
-                            .vehicle_classes = vehicle_classes,
-                            #this `simplified` argument just strips some of the
-                            #columns we don't need any more from the outpu - if all columns are wanted
-                            #change it to false
-                            .simplified = TRUE) {
+#running the function
+base_year_cc <- cost_curves() %>%
+  unique()
 
 
-    #let's join the datasets so that we get our weights into the data
-    .cost_curves <- left_join(.cost_curves, .vehicle_classes)
 
-    #now we're just quickly going to simplfy the dataset back to the fundamental things
-    #that we really need
+#interpolating between base years ----------------------------------------------
 
-    if (.simplified == TRUE) {
-      .cost_curves <- .cost_curves %>%
-        select(vech_type_no, tech_pkg_no, cap, aie, incr_cost, year, vehicle_group,
-               baseline_emissions, total_cost_aus, weight, total_emissions)
-    }
+#the previous code established our ICE cost curves for the 2 'base' years; 2021 and 2025.
 
-    .cost_curves <- .cost_curves %>%
-      filter(vehicle_group != "unused") %>%
-      group_by(vehicle_group, tech_pkg_no, year) %>%
-      summarise(weighted_cost =
-               weighted.mean(x = total_cost_aus, w = weight),
-             weighted_emissions =
-               weighted.mean(x = total_emissions, w = weight),
-             aie =  weighted.mean(x = aie, w = weight),
-             incr_cost =  weighted.mean(x = incr_cost, w = weight))
+#The following code extrapolates these costs to include years 2021 to 2025. Data between 2021 and 2025
+#is linearly interpolated. Data beyond 2025 is assumed as frozen at 2025 values.
+#This is a conservative estimate that assumes manufacturers do not prioritise advancing ICE
+#technology beyond 2025.
 
+#Interpolating between 2021 and 2025
 
-    #adding the point 0
+#firstly for the incremental costs
+ice_costs <- base_year_cc %>%
+  select(-incr_reduction) %>%
+  pivot_wider(names_from = year,
+              values_from = incr_cost) %>%
+  mutate(`2022` = `2021` + (`2025`-`2021`)/4 * 1,
+         `2023` = `2021` + (`2025`-`2021`)/4 * 2,
+         `2024` = `2021` + (`2025`-`2021`)/4 * 3) %>%
+  pivot_longer((3:7),
+               names_to = "year",
+               values_to = "incr_cost")
 
-    initial <- .vehicle_classes %>%
-      select(vehicle_group, type_emissions_average) %>%
-      group_by(vehicle_group) %>%
-      summarise(weighted_emissions = mean(type_emissions_average)) %>%
-      mutate(weighted_cost = 0,
-             tech_pkg_no = 0,
-             year21 = 2021,
-             year25 = 2025,
-             aie = 0) %>%
-      pivot_longer(c("year21", "year25"),
-                   values_to = "year") %>%
-      select(-name) %>%
-      mutate(year = as.character(year))
+#and the incremental efficiency improvements
+ice_incr_reduction <- base_year_cc %>%
+  select(-incr_cost) %>%
+  pivot_wider(names_from = year,
+              values_from = incr_reduction) %>%
+  mutate(`2022` = `2021` + (`2025`-`2021`)/4 * 1,
+         `2023` = `2021` + (`2025`-`2021`)/4 * 2,
+         `2024` = `2021` + (`2025`-`2021`)/4 * 3) %>%
+  pivot_longer((3:7),
+               names_to = "year",
+               values_to = "incr_reduction")
 
-    .cost_curves <- rbind(.cost_curves, initial)
-
-}
+#combining datasets and freezing values to 2050
+ice_cost_curves <- inner_join(ice_costs, ice_incr_reduction) %>%
+  mutate(year = as.integer(year)) %>%
+  group_by(vehicle_group, tech_pkg_no) %>%
+  complete(year = (2026:2050)) %>%
+  arrange(vehicle_group, tech_pkg_no, year) %>%
+  mutate(incr_cost = case_when(
+    tech_pkg_no == 0 ~ 0,
+    tech_pkg_no != 0 ~ incr_cost)) %>%
+  na.locf()
 
 
 
 
+#Saving completed ICE cost curves  ---------------------------------------------
+
+write_rds(ice_cost_curves, "data/temp/ice_cost_curves.rds")
 
 
-#USING FUNCTION TO GENERATE OUTPUT-----------------------------------------------
-
-#using the above functions on the epa data for 2021 and 2025 (putting into one df)
-#we're setting al the vehicle to 100 so we can calculate the data as a % increase.
-
-#cost_curves_all <- rbind(cost_curves(packages_2021), cost_curves(packages_2025))
-#cost_curves_all <- simplify_curves(cost_curves_all)
-
-
-cost_curves_all <- bind_rows(
-                  cost_curves(packages_2021,
-                         .vehicle_type = (1:19),
-                         .passenger = 100,
-                         .suv = 100,
-                         .lcv = 100),
-                   cost_curves(packages_2025,
-                         .vehicle_type = (1:19),
-                         .passenger = 100,
-                         .suv = 100,
-                         .lcv = 100)
-                  )
-
-
-
-cost_curves_all <- simplify_curves(cost_curves_all) %>%
-  group_by(vehicle_group) %>%
-    mutate(perc_reduction = 100 - weighted_emissions) %>%
-  mutate(perc_reduction = case_when(
-    perc_reduction < 0 ~ 0,
-    perc_reduction >= 0 ~ perc_reduction)) %>%
-  select(-weighted_emissions) %>%
-  rename("weighted_emissions" = perc_reduction)
-
-
-write_rds(cost_curves_all, "data/temp/ice_costs_base_years.rds")
-
-
-#plot 1 - faceted by year
-cost_curves_all %>%
-  ggplot(aes(x = weighted_emissions, y = weighted_cost)) +
-  geom_point(aes(colour = vehicle_group)) +
-  facet_wrap(~year) +
-  theme_grattan(legend = "top",
-                chart_type = "scatter") +
-  grattan_y_continuous(limits = c(0,20000)) +
-  grattan_x_continuous() +
-  grattan_colour_manual(3) +
-  labs(title = "Vehicles could reduce emissions cheaply in the short term, wihout EV's",
-       subtitle = "Cost of reducing emissions (CO2) across vehicle types, g/km",
-       y = "Total cost ($2021)",
-       x = "Test cycle emissions (gCO2/km)",
-       caption = "EV's and hybrids are excluded for all improvements. ")
-
-
-#plot 2 - faceted by vehicle class
-cost_curves_all %>%
-  ggplot(aes(x = weighted_emissions, y = weighted_cost)) +
-  geom_point(aes(colour = year)) +
-  facet_wrap(~vehicle_group) +
-  theme_grattan(legend = "top",
-                chart_type = "scatter") +
-  grattan_y_continuous(limits = c(0,15000),
-                       breaks = c(0, 5000, 10000, 15000),
-                       labels = dollar) +
-  grattan_x_continuous(limits = c(0, 250)) +
-  grattan_colour_manual(3) +
-  coord_flip() +
-  labs(title = "Vehicles could reduce emissions cheaply in the short term, without EV's",
-       subtitle = "Cost of reducing emissions (CO2) across vehicle types, g/km",
-       y = "Total cost ($2021)",
-       x = "Test cycle emissions (gCO2/km)",
-       capion = "EV's and hybrids are excluded for all improvements.")
-
-
-
-
-
-
-
-#generating % improvement/cost charts for each type (just for 2021 numbers)
-#-----------------------------------------------------
-
-perc_2021 <- cost_curves(packages_2021,
-                         .vehicle_type = (1:19),
-                         .passenger = 100,
-                         .suv = 100,
-                         .lcv = 100)
-
-perc_2021 <- simplify_curves(perc_2021) %>%
-  group_by(vehicle_group) %>%
-  mutate(perc_reduction = 100 - weighted_emissions) %>%
-  filter(year == 2021) %>%
-  mutate(perc_reduction = case_when(
-    perc_reduction < 0 ~ 0,
-    perc_reduction >= 0 ~ perc_reduction
-  ))
-
-perc_2021 %>%
-  ggplot(aes(x = perc_reduction, y = weighted_cost, colour = vehicle_group)) +
-  geom_point() +
-  geom_smooth(se = FALSE) +
-  theme_grattan(legend = "top", chart_type = "scatter") +
-  grattan_colour_manual(3) +
-  scale_y_continuous_grattan(limits = c(0, 10000)) +
-  scale_x_continuous_grattan(limits = c(0, 100)) +
-  labs(title = "There are many options to improve ICE efficiency relatively cheaply",
-       subtitle = "Percentage reduction of emisions and cost, 2021",
-       x = "Percentage co2 emissions reduction",
-       y = "Cost ($)",
-       caption = "These cost curves assume a base model vehicle. Current selling vehicles are likely
-       to already incorerate some technology listed on the curve to some extent. It is likely
-       a passenger vehicle has ~20% reduction already incorperated, while due to higher rates
-       of diesel engines LCV's have up to 30% depending on the model.")
 
