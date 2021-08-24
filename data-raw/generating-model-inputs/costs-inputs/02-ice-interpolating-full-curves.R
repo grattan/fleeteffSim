@@ -1,33 +1,25 @@
 # 02-ice-interpolating-full-curves
-
 # by Lachlan Fox, Grattan Institute
-# SET UP =======================================================================
-# Packages ---------------------------------------------------------------------
-library(tidyverse)
-library(lubridate)
-library(scales)
-library(purrr)
-library(glue)
-library(fst)
-library(janitor)
-library(grattantheme)
-library(spatstat)
-library(ggtext)
-library(zoo)
-library(readxl)
-# Project functions ------------------------------------------------------------
-`%nin%` <- Negate(`%in%`)
-# READ DATA  ===================================================================
 
-#this data comes from the previous script where we got the costs for the base
-#years (2021 and 2025) from the EPA data
-ice_cost_curves_base <- read_rds("data/temp/ice_costs_base_years.rds")
+#This script takes the aggregated base year cost curves (for 2021 and 2025) as detailed
+#in script 01_ice_cost_curve_creation and extrapolates the results to give a range of years
+#from 2021 to 2050.
+
+# Setup ------------------------------------------------------------------------
+
+source("data-raw/generating-model-inputs/00-setup.R")
 
 
+# Read data  -------------------------------------------------------------------
 
-# Interpolating between base years ==============================================
-#we're going to linearly interpolate betweent the years 2021-2025, and then beyond
-#2025 we're going to assume that costs freeze, because amnufacturers are focusing on ev's
+#Data from the previous script 01_ice_cost_curve_creation
+
+ice_cost_curves_base <- read_rds("data-raw/temp/ice_costs_base_years.rds")
+
+# Interpolating between base years  --------------------------------------------
+
+#we're going to linearly interpolate between the years 2021-2025, and then beyond
+#2025 we're going to assume that costs freeze, because manufacturers are focusing on ev's
 #this is evidently a conservative estimate, and it's likely costs would continue to fall post 2025
 
 #for the total costs
@@ -64,6 +56,8 @@ ice_incr_costs <- ice_cost_curves_base %>%
   pivot_longer((3:7),
                names_to = "year",
                values_to = "incr_cost")
+
+
 
 #now repeating this for the emissions
 

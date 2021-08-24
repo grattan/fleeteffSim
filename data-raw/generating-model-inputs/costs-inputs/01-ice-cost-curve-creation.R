@@ -1,78 +1,73 @@
-# xx-cost-curve-creation
+# 01-cost-curve-creation
 # by Lachlan Fox, Grattan Institute
 
-#This script creates cost curves for the broad categories (small_passenger, passenger,
-#small_suv, suv, and lcv) that were created in the 01-vehicle-classification script.
+#This script creates cost curves for the categories (passenger,
+#suv, and lcv) that were created in the 01-vehicle-classification script.
 
-#It does this by averging the cost curves (and caps) between the different EPA classes
+#It does this by averaging the cost curves (and caps) between the different EPA classes
 #contained within each broad class, based on weights that represent the characteristics
 #of the Australian fleet.
 
-# SET UP =======================================================================
-# Packages ---------------------------------------------------------------------
-library(tidyverse)
-library(lubridate)
-library(scales)
-library(purrr)
-library(glue)
-library(fst)
-library(janitor)
-library(grattantheme)
-library(spatstat)
-library(ggtext)
-library(readxl)
-library(scales)
-# Project functions ------------------------------------------------------------
-`%nin%` <- Negate(`%in%`)
-# READ DATA  ===================================================================
+# Setup ------------------------------------------------------------------------
+
+source("data-raw/generating-model-inputs/00-setup.R")
+
+# Read data: Vehicle classes ---------------------------------------------------
 
 #data on the australia fleet vehicle classes and breakdown into epa
-vehicle_classes <- read_xlsx("data/collected/ntc-vehicle-collected-type.xlsx",
+vehicle_classes <- read_xlsx("data-raw/collected/ntc-vehicle-collected-type.xlsx",
                              sheet = "epa_type_breakdown") %>%
   rename(vech_type_no = epa_type,
          vehicle_group = type) %>%
   filter(vech_type_no != "total") %>%
   mutate(vech_type_no = as.double(vech_type_no))
 
-write_rds(vehicle_classes, "data/temp/vehicle_classes.rds")
+write_rds(vehicle_classes, "data-raw/temp/vehicle_classes.rds")
 
-#------------
+
+#Read data: EPA cost curves ----------------------------------------------------
 
 #EPA cost curve data for both 2021 and 2025. This data was obtained from:
-#     NEED TO PUT IN SOURCE HERE!!!
+#https://www.epa.gov/regulations-emissions-vehicles-and-engines/optimization-model-reducing-emissions-greenhouse-gases
+#Data is contained within the downloadable files with the 2016 draft TAR run of the OMEGA
+#model for both 2021 and 2025, for all 29 sepcified vehicle types.
+#files accompyaning model version OMEGA v1.4.56 were used in this analysis.
 
-packages_2021 <- read_xls("data/epa/2021-technology-packages.xls") %>%
+#for a broad overview of the OMEGA model and technology packages developed for the modelling approach
+#see https://theicct.org/sites/default/files/publications/Camry_OMEGA_WorkingPaper_20180227.pdf,
+#and https://theicct.org/sites/default/files/publications/Canada_CAFE_2%20Methods_20180912.pdf
+
+#for further detailed documentation of vehicle types and technology packages used in the OMEGA model, see
+#the technical support document to the 2016 draft TAR:
+#https://nepis.epa.gov/Exe/ZyPDF.cgi?Dockey=P100Q3L4.pdf
+
+packages_2021 <- read_xls("data-raw/epa/2021-technology-packages.xls") %>%
   select(1:8, -4) %>%
   clean_names() %>%
   mutate(year = "2021") %>%
-  #removing all ev/hybrid data from the curves. This will be dealt with seperately
+  #removing all ev data from the curves. This will be dealt with seperately
   filter(primary_fuel == "G")
 
 
-packages_2025 <- read_xls("data/epa/2025-technology-packages.xls") %>%
+packages_2025 <- read_xls("data-raw/epa/2025-technology-packages.xls") %>%
   select(1:8, -4) %>%
   clean_names() %>%
   mutate(year = "2025") %>%
-  #removing all ev/hybrid data from the curves. This will be dealt with seperately
+  #removing all ev data from the curves. This will be dealt with seperately
   filter(primary_fuel == "G")
 
 
 
+# Cost curve function all types =================================================
 
-
-
-
-
-# COST CURVE FUNCTION ALL TYPES =================================================
-
-#should probably turn this into a function
+#the cost curves functioncalculates the
 
 cost_curves <- function(.packages, .vehicle_type = (1:19),
                         .passenger = 149,
                         .suv = 184,
                         .lcv = 226) {
 
-  #just deling with 2021 for the moment
+
   .packages <- .packages %>%
     filter(vech_type_no %in% (1:19)) %>%
     filter(vech_type_no %in% .vehicle_type) %>%
@@ -137,10 +132,6 @@ cost_curves <- function(.packages, .vehicle_type = (1:19),
 
   return(.packages)
 }
-
-
-
-
 
 
 
@@ -220,16 +211,20 @@ simplify_curves <- function(.cost_curves,
 #cost_curves_all <- simplify_curves(cost_curves_all)
 
 
-cost_curves_all <- rbind(cost_curves(packages_2021,
+cost_curves_all <- bind_rows(
+                  cost_curves(packages_2021,
                          .vehicle_type = (1:19),
                          .passenger = 100,
                          .suv = 100,
                          .lcv = 100),
                    cost_curves(packages_2025,
-                               .vehicle_type = (1:19),
-                               .passenger = 100,
-                               .suv = 100,
-                               .lcv = 100))
+                         .vehicle_type = (1:19),
+                         .passenger = 100,
+                         .suv = 100,
+                         .lcv = 100)
+                  )
+
+
 
 cost_curves_all <- simplify_curves(cost_curves_all) %>%
   group_by(vehicle_group) %>%
