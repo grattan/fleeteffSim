@@ -13,7 +13,7 @@
 #' \item{\code{incr_cost}}{The incremental cost of applying the given upgrade (compared to the previous technology
 #' package) for the given vehicle type, in a given year}
 #' \item{\code{incr_reduction}}{The incremental emissions reduction (as a proportion of emissions stated between
-#' 0 and 1. 1 refers to a 100% reduction in emissions.)}
+#' 0 and 1. 1 refers to a 100\% reduction in emissions.)}
 #' \item{\code{type}}{The upgrade type - defined as either an upgrade to electric (ev) or
 #' as an improvement to an ICE engine (ice)}
 #' \item{\code{tech_pkg_no}}{The technology package to be applied. tech_pkg_no 100 refers to an electric vehicle.

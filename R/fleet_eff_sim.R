@@ -44,7 +44,8 @@
 #' @param .in_premium_95 Defaults to 0.15. The assumed proportion of ICE vehicles requiring premium 95ron petrol.
 #' @param .in_premium_98 Defaults to 0.05. The assumed proportion of ICE vehicles requiring premium 98ron petrol.
 #'
-#' @return
+#' @return A \code{tibble} containing the estimates vehicle costs (per vehicle),
+#' fuel savings (per vehicle), emissions sabings (total, Mt) and BCR under various discount rates.
 #' @export
 #'
 #'
@@ -83,8 +84,8 @@ fleet_eff_sim <- function(#cost model inputs
                         .in_passenger_diesel = 0.02,
                         .in_suv_diesel = 0.21,
                         .in_lcv_diesel = 0.92,
-                        #the racv says about 20% of cars run on premium fuels. We are assuming that this is
-                        #15% 95oct and 5% 98, but there is not hard data on this
+                        #the racv says about 20\% of cars run on premium fuels. We are assuming that this is
+                        #15\% 95oct and 5\% 98, but there is not hard data on this
                         .in_premium_95 = 0.15,
                         .in_premium_98 = 0.05) {
 
