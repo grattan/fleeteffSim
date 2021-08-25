@@ -14,7 +14,7 @@
 #' @export
 #'
 
-globalVariables(c("estimate", "existing_tech", "weighted_emissions",
+globalVariables(c("estimate", "existing_tech", "cumulative_reduction",
                   "proportion_left", "incr_reduction", "difference"))
 
 add_existing_technology <- function(.type,
@@ -26,8 +26,8 @@ add_existing_technology <- function(.type,
     filter(vehicle_group == .type,
            estimate == .estimate) %>%
     mutate(existing_tech = case_when(
-      .existing_tech >= weighted_emissions ~ "existing",
-      .existing_tech < weighted_emissions ~ "not existing"
+      .existing_tech >= cumulative_reduction ~ "existing",
+      .existing_tech < cumulative_reduction ~ "not existing"
     ))
 
   .existing_tech_no <- .cost_curves %>%
@@ -48,8 +48,8 @@ add_existing_technology <- function(.type,
   #i.e. how far between the last existing tech and this next one we are
   .next_tech <- .cost_curves %>%
     filter(tech_pkg_no == .existing_tech_no + 1) %>%
-    mutate(difference = weighted_emissions - .existing_tech) %>%
-    mutate(proportion_left = (weighted_emissions - .existing_tech) / weighted_emissions,
+    mutate(difference = cumulative_reduction - .existing_tech) %>%
+    mutate(proportion_left = (cumulative_reduction - .existing_tech) / cumulative_reduction,
            #now linearly working out much much of the next package is 'left' to be applied
            #because it's linear the $/g stays the same, which doesn't affect application
            incr_cost = incr_cost * proportion_left,

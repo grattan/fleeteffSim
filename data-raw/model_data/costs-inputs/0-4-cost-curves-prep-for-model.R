@@ -6,7 +6,7 @@
 
 # Setup -----------------------------------------------------------------------
 
-source("data-raw/generating-model-inputs/00-setup.R")
+source("data-raw/model_data/00-setup.R")
 
 #for the actual model, we need to have standardised cost curves for everything that
 #we can work with easily and that can take the arguments we want to use
@@ -23,15 +23,22 @@ source("data-raw/generating-model-inputs/00-setup.R")
 
 #Read data: cost curves --------------------------------------------------------
 
-ev_cost_curves <- read_rds("data-raw/temp/ev_cost_curve.rds") %>%
+ev_cost_curves <- read_rds("data-raw/model_data/temp/ev_cost_curve.rds") %>%
   select(-conventional, -electric) %>%
   rename("incr_cost" = incremental_cost) %>%
   mutate(incr_reduction = 1,
          type = "ev",
          #we arbitrarily use tech_pkg_no = 100 for EV's.
-         tech_pkg_no = 100)
+         tech_pkg_no = 100,
+         base_emissions = case_when(
+           #the following values are those used in the `fleet_creator` function
+           vehicle_group == "lcv" ~ 215,
+           vehicle_group == "suv" ~ 177.7,
+           vehicle_group == "passenger" ~ 158.4),
+         weighted_emissions = 0)
 
-ice_cost_curves <- read_rds("data-raw/temp/ice_cost_curves.rds") %>%
+
+ice_cost_curves <- read_rds("data-raw/model_data/temp/ice_cost_curves.rds") %>%
   mutate(type = "ice")
 
 
@@ -94,6 +101,6 @@ cost_curves <- cost_curves %>%
 
 
 #and saving the file
-write_rds(cost_curves, "data-raw/cost-curves/cost_curves.rds")
+write_rds(cost_curves, "data-raw/model_data/final-data/cost_curves.rds")
 
 

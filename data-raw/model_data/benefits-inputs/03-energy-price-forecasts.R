@@ -1,17 +1,19 @@
-#energy price forecast
 
-source("R/00-setup.R")
+# 03-energy-price-forecast
+# by Lachlan Fox, Grattan Institute
+
+#This script produces a forecast of energy prices for use in the fleeEffSim model
+
+# Setup ------------------------------------------------------------------------
+
+source("data-raw/model_data/00-setup.R")
+
+# Energy prices  ---------------------------------------------------
 
 
-#there's a lack of great information
+#in our central scenario, we're going to assume that prices remain steady
+#the base electricity cost is taken from (page 4 )
 #https://www.aemc.gov.au/sites/default/files/2020-12/2020%20Residential%20Electricity%20Price%20Trends%20report%20-%2015122020.pdf
-
-#but in our central scenario, we're going to assume for the moment that we have a 1% a year
-#increase in electricity prices (this is the same as BITRE's assumption)
-
-#the base electricity cost (
-#from https://www.aemc.gov.au/sites/default/files/2020-12/2020%20Residential%20Electricity%20Price%20Trends%20report%20-%2015122020.pdf
-#page 4 )
 #is assumed to be $0.27/kW in 2021 (base year)
 
 energy_cost <- tibble() %>%
@@ -21,7 +23,7 @@ energy_cost <- tibble() %>%
 
 #no we're going to add our change in price through a little function
 
-energy_rate <- function(.rate = 1.015,
+energy_rate <- function(.rate = 1.0,
                         .energy_cost = energy_cost) {
 
     i <- 2
@@ -45,10 +47,10 @@ cheap_energy <- energy_rate(.rate = 0.99, .energy_cost = energy_cost) %>%
 exp_energy  <- energy_rate(.rate = 1.02, .energy_cost = energy_cost) %>%
   mutate(scenario = "high_price")
 
-#and a night charging scenario with a steady but lower price
+#and an off-peak charging scenario with a steady but lower price (e.g. charging overnight)
 night <- energy_cost %>%
   select(-energy_price) %>%
-  mutate(scenario = "night",
+  mutate(scenario = "off-peak",
          energy_price = 0.20)
 
 #now binding all three together
@@ -63,7 +65,7 @@ energy_forecasts <- bind_rows(cheap_energy, exp_energy, central_energy, night) %
   na.locf()
 
 #and saving our dataset
-write_rds(energy_forecasts, "data/model-inputs/energy_price_forecast.rds")
+write_rds(energy_forecasts, "data-raw/model_data/final-data/energy_price_forecast.rds")
 
 
 

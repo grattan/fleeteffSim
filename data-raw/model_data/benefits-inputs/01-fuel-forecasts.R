@@ -1,4 +1,14 @@
-#fuel price forecasts
+# 01-fuel-forecasts
+# by Lachlan Fox, Grattan Institute
+
+#This script produces a future fuel price scenario for use in the fleetEffSim model
+
+# Setup ------------------------------------------------------------------------
+
+source("data-raw/model_data/00-setup.R")
+
+#fuel price forecast -----------------------------------------------------------
+
 #the price forecasts are developed from a range of sources.
 
 #Australian institute of Petroleum data is used for historical data
@@ -14,7 +24,7 @@
 #this data was corrected to remove taxes applied to fuel to provide the before tax prices.
 #tax data was obtained from here: https://data.gov.au/data/dataset/excise-data/resource/b9227cdf-4c04-492d-bd84-65031adc408e
 
-#we have used 2019 as our base year given 2020 is an anomoly due to covid and 2021 data
+#we have used 2019 as our base year given 2020 is an anomaly due to covid and 2021 data
 #is incomplete/less accessible
 #we have used an RACV report data: https://www.racv.com.au/royalauto/moving/news-information/premium-petrol-guzzling-cash.html
 #to get a price comparison between the different fuel types. This % difference was assumed
@@ -22,7 +32,7 @@
 
 #the historical data, adjusted for inflation and stripped of taxes
 #this shows that prices have declined since ~2007
-historical_prices <- read_xlsx("data/aip/AIP_Annual_Retail_Price_Data.xlsx",
+historical_prices <- read_xlsx("data-raw/external_data/aip/AIP_Annual_Retail_Price_Data.xlsx",
                             sheet = "adjusted-historical") %>%
   pivot_longer(cols = (2:3),
                names_to = "fuel",
@@ -41,7 +51,7 @@ historical_prices %>%
 #ie. page 2 (page 6 of pdf). As a result, our central scenario assumes rices remain flat
 #https://www.accc.gov.au/system/files/20-27RPT_Petrol%2520Quarterly%2520Report%2520-%2520June%25202020_FA.pdf
 
-fuel_forecasts <- read_xlsx("data/aip/AIP_Annual_Retail_Price_Data.xlsx",
+fuel_forecasts <- read_xlsx("data-raw/external_data/aip/AIP_Annual_Retail_Price_Data.xlsx",
                   sheet = "petrol-forecasts") %>%
   #in order to get our residual values beyond 2050 we're going to freeze prices at
   #2050 levels and extend these to 2050
@@ -55,4 +65,4 @@ fuel_forecasts <- read_xlsx("data/aip/AIP_Annual_Retail_Price_Data.xlsx",
                values_to = "price")
 
 
-write_rds(fuel_forecasts, "data/model-inputs/fuel-forecasts.rds")
+write_rds(fuel_forecasts, "data-raw/model_data/final-data/fuel-forecasts.rds")

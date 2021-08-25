@@ -1,6 +1,18 @@
-#ev-energy-consumption
+#04-ev-energy-consumption
+# by Lachlan Fox, Grattan Institute
 
-#from the ICCT paper they have efficiencies of
+#This script produces estimates of the electricity consumption of electric vehicles by type
+#and year for the fleetEffSim model
+
+# Setup ------------------------------------------------------------------------
+
+source("data-raw/model_data/00-setup.R")
+
+# Assumptions : ----------------------------------------------------------------
+
+#from the ICCT paper they have efficiencies of:
+#' (https://theicct.org/sites/default/files/publications/EV_cost_2020_2030_20190401.pdf)
+
 # type        :   2018 kWh/mile    :  2030 kWh/mile
 #-----            ------------        -------------
 # passenger   :   0.30             :  0.28
@@ -78,7 +90,7 @@ energy_consumption <- energy_consumption %>%
   na.locf()
 
 
-write_rds(energy_consumption, "data/model-inputs/ev_energy_consumption.rds")
+write_rds(energy_consumption, "data-raw/model_data/final-data/ev_energy_consumption.rds")
 
 
 

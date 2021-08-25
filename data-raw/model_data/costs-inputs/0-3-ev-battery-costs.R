@@ -7,12 +7,12 @@
 
 # Setup -----------------------------------------------------------------------
 
-source("data-raw/generating-model-inputs/00-setup.R")
+source("data-raw/model_data/00-setup.R")
 
 # Read data: UBS costs ---------------------------------------------------------
 
 #data prepared in the previous script `ev_interpolating_base_years`
-ad_ubs_costs <- read_rds("data-raw/temp/adjusted_ubs_costs.rds")
+ad_ubs_costs <- read_rds("data-raw/model_data/temp/adjusted_ubs_costs.rds")
 
 
 
@@ -23,7 +23,7 @@ ad_ubs_costs <- read_rds("data-raw/temp/adjusted_ubs_costs.rds")
 #it comes from https://nepis.epa.gov/Exe/ZyPDF.cgi?Dockey=P100Q3L4.pdf , pages 478-487
 #some explanatory notes are also contained here: https://www.mdpi.com/2032-6653/9/3/42
 
-battery_costs <- read_xlsx("data-raw/epa/ev-costs-epa.xlsx",
+battery_costs <- read_xlsx("data-raw/external_data/epa/ev-costs-epa.xlsx",
                            sheet = "batterycosts-ev") %>%
   clean_names() %>%
   filter(cost_type == "TC") %>%
@@ -77,7 +77,7 @@ battery_costs <- rbind(battery_costs, lcv_battery_costs)
 #script `01-ice-cost-curve-creation`, which is based on the Australian fleet.
 #the `vehicle_classes` dataframe in script one has the following
 
-vehicle_classes <- read_rds("data-raw/temp/vehicle_classes.RDS")
+vehicle_classes <- read_rds("data-raw/model_data/temp/vehicle_classes.RDS")
 
 #from this, we get the following:
     # 1 - small car       :     corresponds to EPA type 1 -         :    weight = 0.0793 (passenger)
@@ -232,7 +232,7 @@ battery_forecasts <- forecast(.data = battery_forecasts,
 
 #first we're going to load in our data on non-battery costs and make some
 #minor changes to make everything consistent between the two datasets
-ad_ubs_costs <- read_rds("data-raw/temp/adjusted_ubs_costs.rds") %>%
+ad_ubs_costs <- read_rds("data-raw/model_data/temp/adjusted_ubs_costs.rds") %>%
   #and just putting in palceholder values for lcv's
   mutate(lcv_cost = suv_cost * 1.3) %>%
   #we're also going to strip out the base costs and make it into a long format
@@ -335,8 +335,8 @@ ev_incremental <- ev_forecast %>%
 
 
 
-write_rds(ev_incremental, "data-raw/temp/ev_cost_curve.rds")
-write_rds(ev_forecast, "data-raw/temp/ev_forecast.rds")
+write_rds(ev_incremental, "data-raw/model_data/temp/ev_cost_curve.rds")
+write_rds(ev_forecast, "data-raw/model_data/temp/ev_forecast.rds")
 
 
 

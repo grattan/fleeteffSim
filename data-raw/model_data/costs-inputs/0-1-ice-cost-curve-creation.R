@@ -10,19 +10,19 @@
 
 # Setup ------------------------------------------------------------------------
 
-source("data-raw/generating-model-inputs/00-setup.R")
+source("data-raw/model_data/00-setup.R")
 
 # Read data: Vehicle classes ---------------------------------------------------
 
 #data on the australia fleet vehicle classes and breakdown into epa
-vehicle_classes <- read_xlsx("data-raw/collected/ntc-vehicle-collected-type.xlsx",
+vehicle_classes <- read_xlsx("data-raw/external_data/collected/ntc-vehicle-collected-type.xlsx",
                              sheet = "epa_type_breakdown") %>%
   rename(vech_type_no = epa_type,
          vehicle_group = type) %>%
   filter(vech_type_no != "total") %>%
   mutate(vech_type_no = as.double(vech_type_no))
 
-write_rds(vehicle_classes, "data-raw/temp/vehicle_classes.rds")
+write_rds(vehicle_classes, "data-raw/model_data/temp/vehicle_classes.rds")
 
 
 #Read data: EPA cost curves ----------------------------------------------------
@@ -41,7 +41,7 @@ write_rds(vehicle_classes, "data-raw/temp/vehicle_classes.rds")
 #the technical support document to the 2016 draft TAR:
 #https://nepis.epa.gov/Exe/ZyPDF.cgi?Dockey=P100Q3L4.pdf
 
-packages_2021 <- read_xls("data-raw/epa/2021-technology-packages.xls") %>%
+packages_2021 <- read_xls("data-raw/external_data/epa/2021-technology-packages.xls") %>%
   select(1:8, -4) %>%
   clean_names() %>%
   mutate(year = "2021") %>%
@@ -49,7 +49,7 @@ packages_2021 <- read_xls("data-raw/epa/2021-technology-packages.xls") %>%
   filter(primary_fuel == "G")
 
 
-packages_2025 <- read_xls("data-raw/epa/2025-technology-packages.xls") %>%
+packages_2025 <- read_xls("data-raw/external_data/epa/2025-technology-packages.xls") %>%
   select(1:8, -4) %>%
   clean_names() %>%
   mutate(year = "2025") %>%
@@ -222,9 +222,44 @@ ice_cost_curves <- inner_join(ice_costs, ice_incr_reduction) %>%
 
 
 
+#' next we're going to add a column to the dataset, `weighted_emissions`, which essentially
+#' keeps a running total of the emissions at each incr adjustment (summing them)
+
+ice_cost_curves <- ice_cost_curves %>%
+  arrange(vehicle_group, year, tech_pkg_no) %>%
+  mutate(base_emissions = case_when(
+    #the following values are those used in the `fleet_creator` function
+    vehicle_group == "lcv" ~ 215,
+    vehicle_group == "suv" ~ 177.7,
+    vehicle_group == "passenger" ~ 158.4)) %>%
+  mutate(weighted_emissions = base_emissions,
+         cumulative_reduction = 0)
+
+i <- 1
+while (i <= nrow(ice_cost_curves)) {
+
+  if (ice_cost_curves$tech_pkg_no[i] == 0){
+    ice_cost_curves$weighted_emissions[i] <- ice_cost_curves$base_emissions[i]
+    ice_cost_curves$cumulative_reduction[i] <- 0
+
+    i <- i + 1
+
+  } else {
+
+    ice_cost_curves$weighted_emissions[i] <- ice_cost_curves$weighted_emissions[i-1] * (1 - ice_cost_curves$incr_reduction[i])
+    ice_cost_curves$cumulative_reduction[i] <- (1 - (ice_cost_curves$weighted_emissions[i] / ice_cost_curves$base_emissions[i])) * 100
+
+    i <- i + 1
+  }
+
+}
+
+
+
+
 #Saving completed ICE cost curves  ---------------------------------------------
 
-write_rds(ice_cost_curves, "data-raw/temp/ice_cost_curves.rds")
+write_rds(ice_cost_curves, "data-raw/model_data/temp/ice_cost_curves.rds")
 
 
 

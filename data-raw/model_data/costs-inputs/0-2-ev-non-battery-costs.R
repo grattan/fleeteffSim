@@ -6,7 +6,7 @@
 
 # Setup ------------------------------------------------------------------------
 
-source("data-raw/generating-model-inputs/00-setup.R")
+source("data-raw/model_data/00-setup.R")
 
 # Read data: ubs vehicle costs -------------------------------------------------
 
@@ -14,7 +14,7 @@ source("data-raw/generating-model-inputs/00-setup.R")
 #this data gives the breakdown of manufacturing costs for ev's (2017 and 2020) and for a
 #conventional vehicle.
 
-ubs_vehicle_costs <- read_xlsx("data-raw/ubs/ubs-2017-teardown-costs.xlsx",
+ubs_vehicle_costs <- read_xlsx("data-raw/external_data/ubs/ubs-2017-teardown-costs.xlsx",
                                sheet = "r-input-costs")
 
 
@@ -121,7 +121,7 @@ ad_ubs_costs <- rbind(el_ubs_costs %>%
 
 
 #the weightings between categories is in the `vehicle_classes` data used previously.
-vehicle_classes <- read_rds("data-raw/temp/vehicle_classes.RDS")
+vehicle_classes <- read_rds("data-raw/model_data/temp/vehicle_classes.RDS")
 
 #the below function scales the costs according to the assumptions outlined above
 vehicle_type_costs <- function(
@@ -269,7 +269,7 @@ ad_ubs_costs <- rbind(ad_ubs_costs,
   mutate(lcv_cost = suv_cost * 1.2)
 
 
-write_rds(ad_ubs_costs, "data-raw/temp/adjusted_ubs_costs.rds")
+write_rds(ad_ubs_costs, "data-raw/model_data/temp/adjusted_ubs_costs.rds")
 
 
 

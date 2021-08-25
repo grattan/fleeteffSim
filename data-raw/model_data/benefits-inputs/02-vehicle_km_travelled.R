@@ -1,18 +1,30 @@
+
+# 02-km_travelled
+# by Lachlan Fox, Grattan Institute
+
+#This script produces data on the assumed distanced travelled by vehicle type and age
+
+# Setup ------------------------------------------------------------------------
+
+source("data-raw/model_data/00-setup.R")
+
+# KM travelled -----------------------------------------------------------------
+
 #fleet/vehicle use characteristics and forecasts
 #this data comes from the motor vehicle survey (tables 1 and 16)
 #(https://www.abs.gov.au/statistics/industry/tourism-and-transport/survey-motor-vehicle-use-australia/latest-release)
 #table 9 comes from the motor vehicle census:
 #(https://www.abs.gov.au/statistics/industry/tourism-and-transport/motor-vehicle-census-australia/latest-release)
 
-km_travelled_type <- read_xlsx("data/abs/motor-vehicle-use-survey.xlsx",
+km_travelled_type <- read_xlsx("data-raw/external_data/abs/motor-vehicle-use-survey.xlsx",
           sheet = "table_1_input") %>%
   clean_names()
 
-km_travelled_age <- read_xlsx("data/abs/motor-vehicle-use-survey.xlsx",
+km_travelled_age <- read_xlsx("data-raw/external_data/abs/motor-vehicle-use-survey.xlsx",
                                sheet = "table_16_input") %>%
   clean_names()
 
-no_vehicle_age <- read_xlsx("data/abs/motor-vehicle-use-survey.xlsx",
+no_vehicle_age <- read_xlsx("data-raw/external_data/abs/motor-vehicle-use-survey.xlsx",
                                sheet = "table_9_input") %>%
   clean_names()
 
@@ -40,7 +52,7 @@ km_travelled_age <- km_travelled_age %>%
   select(-kilometres_travelled_thousands)
 
 
-#plotting these relationships
+#plotting -----------------------------------------------------------------
 km_travelled_age %>%
   ggplot(aes(x = age, y = km_travelled)) +
   geom_point(aes(colour = vehicle_type)) +
@@ -52,7 +64,7 @@ km_travelled_age %>%
   labs(title = "Vehicles travel less as they get older",
        subtitle = "Vehicle age vs average yearly km travelled")
 
-grattan_save_all("atlas/km-travelled_age.pdf")
+
 
 #and getting the equation for passenger vehicles
 passenger_regression <- lm(data = km_travelled_age %>%
@@ -83,11 +95,8 @@ lcv_regression <- lm(data = km_travelled_age %>%
 #the age of vehicles. This way when we run the model, depending on the age of the cars in
 #the model we can determine how far they are likely to drive in a given year.
 
-#we will assume the average life of a car is 15 years, in line with modelling
-#by the climate change authority
-#(https://www.climatechangeauthority.gov.au/sites/default/files/2020-06/Light%20Vehicle%20Report/Lightvehiclesreport.pdf)
-#page 47
-#so beyond 15 years we will truncate the km travelled to 0
+#we will assume the average life of a car is 17 years, in line with modelling
+#so beyond 17 years we will truncate the km travelled to 0
 
 km_travelled <- tibble() %>%
   mutate(age = 0) %>%
@@ -113,7 +122,7 @@ km_travelled <- tibble() %>%
 
 
 #now we want to save this data
-write_rds(km_travelled, "data/model-inputs/km_traveled.rds")
+write_rds(km_travelled, "data-raw/model_data/final-data/km_traveled.rds")
 
 
 
