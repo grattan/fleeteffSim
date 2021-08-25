@@ -45,7 +45,7 @@
 #' @param .in_premium_98 Defaults to 0.05. The assumed proportion of ICE vehicles requiring premium 98ron petrol.
 #'
 #' @return A \code{tibble} containing the estimates vehicle costs (per vehicle),
-#' fuel savings (per vehicle), emissions sabings (total, Mt) and BCR under various discount rates.
+#' fuel savings (per vehicle), emissions savings (total, Mt) and BCR under various discount rates.
 #' @export
 #'
 #'
@@ -63,7 +63,7 @@ fleet_eff_sim <- function(#cost model inputs
                         .in_target_scenario = "target_central",
                         .in_bau_scenario = "bau",
                         .in_cost_curves = cost_curves,
-                        .in_estimate = "central",
+                        .in_cost_curves_estimate = "central",
                         .in_suv_existing_tech = 20,
                         .in_passenger_existing_tech = 13,
                         .in_lcv_existing_tech = 15,
@@ -105,7 +105,7 @@ fleet_eff_sim <- function(#cost model inputs
                                         .target_file = .in_target_file,
                                         .target_scenario = .in_target_scenario,
                                         .cost_curves = .in_cost_curves,
-                                        .estimate = .in_estimate,
+                                        .estimate = .in_cost_curves_estimate,
                                         .suv_existing_tech = .in_suv_existing_tech,
                                         .passenger_existing_tech = .in_passenger_existing_tech,
                                         .lcv_existing_tech = .in_lcv_existing_tech,
@@ -117,7 +117,7 @@ fleet_eff_sim <- function(#cost model inputs
                                         .target_file = .in_target_file,
                                         .target_scenario = .in_bau_scenario,
                                         .cost_curves = .in_cost_curves,
-                                        .estimate = .in_estimate,
+                                        .estimate = .in_cost_curves_estimate,
                                         .suv_existing_tech = .in_suv_existing_tech,
                                         .passenger_existing_tech = .in_passenger_existing_tech,
                                         .lcv_existing_tech = .in_lcv_existing_tech,

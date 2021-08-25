@@ -70,7 +70,7 @@ a I4 petrol engine (assumed as 2008 base model equivalent).}
 }
 \value{
 A \code{tibble} containing the estimates vehicle costs (per vehicle),
-fuel savings (per vehicle), emissions sabings (total, Mt) and BCR under various discount rates.
+fuel savings (per vehicle), emissions savings (total, Mt) and BCR under various discount rates.
 }
 \description{
 This function runs the fleet efficiency simulation model over a simulated fleet of new vehicle sales between now
