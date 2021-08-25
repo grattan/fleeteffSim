@@ -224,7 +224,7 @@ ice_cost_curves <- inner_join(ice_costs, ice_incr_reduction) %>%
 
 #Saving completed ICE cost curves  ---------------------------------------------
 
-write_rds(ice_cost_curves, "data/temp/ice_cost_curves.rds")
+write_rds(ice_cost_curves, "data-raw/temp/ice_cost_curves.rds")
 
 
 
