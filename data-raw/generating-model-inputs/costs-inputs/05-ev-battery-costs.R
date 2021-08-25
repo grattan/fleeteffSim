@@ -4,23 +4,8 @@
 #for each car type out to 2035. These are later integrated with the other ev cost
 #data to create overall cost curves for ev's out to 2035.
 
-# by Lachlan Fox, Grattan Institute
-# SET UP =======================================================================
-# Packages ---------------------------------------------------------------------
-library(tidyverse)
-library(lubridate)
-library(scales)
-library(purrr)
-library(glue)
-library(fst)
-library(janitor)
-library(grattantheme)
-library(spatstat)
-library(ggtext)
-library(readxl)
-library(zoo)
-# Project functions ------------------------------------------------------------
-`%nin%` <- Negate(`%in%`)
+
+
 # READ DATA  ===================================================================
 
 #first reading in the data we preapred in the last script, `03-ev-costs-base-years`

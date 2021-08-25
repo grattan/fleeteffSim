@@ -18,3 +18,9 @@ library(data.table)
 library(readr)
 # Project functions ------------------------------------------------------------
 `%nin%` <- Negate(`%in%`)
+
+#Project values
+
+us_aus_exchange <- 1.30
+us_inflation_2017 <- 1.11
+us_inflation_2015 <- 1.15
