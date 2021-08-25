@@ -26,7 +26,7 @@
 
 globalVariables(c("passenger", "lcv", "suv", "total", "share", "base_emissions"))
 
-fleet_creator <- function(.i_cars = 10, # (each car represents 10% of new vehicle sales)
+fleet_creator <- function(.i_cars = 100, # (each car represents 10% of new vehicle sales)
                           #shares from: https://www.ntc.gov.au/sites/default/files/assets/files/Carbon-dioxide-emissions-intensity-for-new-Australian-light-vehicles-2019.pdf
                           #page 23 and scaled to make 100% by adding in the 5% to passenger vehicles (as that's the sports/people movers and where they fall)
 
