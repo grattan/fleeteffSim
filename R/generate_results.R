@@ -86,7 +86,7 @@ summarise_fes_results <- function(.data) {
 
 globalVariables(c("vehicle_age", "cost", "fuel_cost", "additional_cost",
                   "emissions_savings", "fuel_cost_savings", "co2_value",
-                  "bcr", "npv", "abatement_cost"))
+                  "bcr", "npv", "abatement_cost", "co2_value_20", "co2_value_35"))
 
 
 
