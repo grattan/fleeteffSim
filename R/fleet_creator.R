@@ -45,11 +45,12 @@ fleet_creator <- function(.i_cars = 100, # (each car represents 10% of new vehic
                           #and we're going to put in the current co2 intensity in each segment
                           #these values are calculated from FCAI data - sales weighted averages
                           #of emissions in each segment
+
                           .passenger_co2 = 158.4,
                           .suv_co2 = 177.7,
                           .lcv_co2 = 215,
                           #for rounding, make 2 if using 100 cars)
-                          .digits = 1) {
+                          .digits = 2) {
 
   #first making a dataset with the changing shares/cars over time
   vehicle_trends <- tibble(year = 2021,
@@ -74,9 +75,9 @@ fleet_creator <- function(.i_cars = 100, # (each car represents 10% of new vehic
 
   #now converting these back into shares
   vehicle_trends <- vehicle_trends %>%
-    mutate(passenger = passenger / total,
-           suv = suv / total,
-           lcv = lcv / total)
+    mutate(passenger = passenger / 100,
+           suv = suv / 100,
+           lcv = lcv / 100)
 
 
   #creating a loop which will add one year at a time

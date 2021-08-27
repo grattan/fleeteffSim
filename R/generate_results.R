@@ -12,7 +12,6 @@
 #' @export
 #'
 
-
 discount <- function(data, rate) {
 
   i <- 1
@@ -20,10 +19,51 @@ discount <- function(data, rate) {
 
     data$additional_cost[i] =  (data$additional_cost[i])  / ((1 + rate)^(i))
     data$fuel_cost_savings[i] =  (data$fuel_cost_savings[i])  / ((1 + rate)^(i))
+    data$co2_value_20[i] =  (data$co2_value_20[i])  / ((1 + rate)^(i))
+    data$co2_value_35[i] =  (data$co2_value_35[i])  / ((1 + rate)^(i))
 
     i <- i + 1
   }
   return(data)
+}
+
+
+
+#' @title Summarise FES results
+#'
+#' @param .data The input data to be summarised
+#'
+#' @return A \code{tibble} with summarised results fora given discount rate scenario
+#' @export
+#'
+
+
+
+summarise_fes_results <- function(.data) {
+
+  .data <- .data %>%
+    #getting the totals from each
+    summarise(additional_cost = sum(additional_cost),
+              emissions_savings = sum(emissions_savings),
+              fuel_cost_savings = sum(fuel_cost_savings),
+              co2_value_20 = sum(co2_value_20),
+              co2_value_35 = sum(co2_value_35)) %>%
+
+    #calculating overall stats
+    mutate(bcr_co2_excluded = fuel_cost_savings/additional_cost,
+           bcr_co2_20_dollar = (fuel_cost_savings + co2_value_20) / additional_cost,
+           bcr_co2_35_dollar = (fuel_cost_savings + co2_value_35) / additional_cost,
+
+           #Because we're using emissions values in tons we need to put costs back into $ not million $
+           abatement_cost = ((additional_cost - fuel_cost_savings) * 1000000)/emissions_savings,
+
+           npv_co2_excluded_m = (fuel_cost_savings - additional_cost),
+           npv_co2_20_dollar_m = (fuel_cost_savings + co2_value_20 - additional_cost),
+           npv_co2_35_dollar_m = (fuel_cost_savings + co2_value_35 - additional_cost))
+
+  return(.data)
+
+
 }
 
 
@@ -44,7 +84,8 @@ discount <- function(data, rate) {
 #'
 
 globalVariables(c("vehicle_age", "cost", "fuel_cost", "additional_cost",
-                  "emissions_savings", "fuel_cost_savings"))
+                  "emissions_savings", "fuel_cost_savings", "co2_value",
+                  "bcr", "npv", "abatement_cost"))
 
 
 
@@ -56,86 +97,81 @@ generate_results <- function(bau_benefits,
     filter(vehicle_age <= 17,
            year > 2021) %>%
     group_by(year) %>%
-    summarise(cost = mean(cost),
-              total_emissions = mean(total_emissions),
-              fuel_cost = mean(fuel_cost))
+    #we multiply by 1,100,000 here because that is the estimate number of new sales
+    #in the base year. Thus we average to get a 'per car' value for each year, and
+    #scale this to the whole fleet size. This is used instead of summing as the number
+    #of cars in the simulated fleet can change in different model runs if specified by
+    #the user.
+    summarise(cost = sum(cost * 11000),
+              total_emissions = sum(total_emissions * 11000),
+              fuel_cost = sum(fuel_cost * 11000))
+
 
   target_summary <- target_benefits %>%
     filter(vehicle_age <= 17,
            year > 2021) %>%
     group_by(year) %>%
-    summarise(cost = mean(cost),
-              total_emissions = mean(total_emissions),
-              fuel_cost = mean(fuel_cost))
+    summarise(cost = sum(cost * 11000),
+              total_emissions = sum(total_emissions * 11000),
+              fuel_cost = sum(fuel_cost * 11000))
 
 
-  #combining this to get the additionaility of each we're interested in
+  #combining this to get the additionality of each we're interested in
   overall_summary <- bau_summary %>%
-    mutate(additional_cost = target_summary$cost - cost,
-           emissions_savings = total_emissions - target_summary$total_emissions,
-           fuel_cost_savings = fuel_cost - target_summary$fuel_cost) %>%
+
+    mutate(additional_cost = (target_summary$cost - cost) / 1000000,
+           emissions_savings = (total_emissions - target_summary$total_emissions),
+           fuel_cost_savings = (fuel_cost - target_summary$fuel_cost) / 1000000,
+           co2_value_20 = emissions_savings * 20 / 1000000,
+           co2_value_35 = emissions_savings * 35 / 1000000) %>%
+
     select(-fuel_cost, -total_emissions, -cost)
 
 
 
-  #--------------------------
-  #undiscounted summary
-  #no discount rate applied
-  undiscounted_summary <- overall_summary %>%
-    summarise(additional_cost = sum(additional_cost),
-              emissions_savings = sum(emissions_savings),
-              fuel_cost_savings = sum(fuel_cost_savings)) %>%
-    mutate(bcr_co2_excluded = fuel_cost_savings/additional_cost,
-           bcr_co2_20_dollar = (fuel_cost_savings + emissions_savings * 20) / additional_cost,
-           bcr_co2_35_dollar = (fuel_cost_savings + emissions_savings * 35) / additional_cost,
-           abatement_cost = (additional_cost - fuel_cost_savings)/emissions_savings) %>%
-    mutate(scenario = "no_discount")
+
+  # Running with 7 and 3 % discount rates ---------------------------------
 
 
-  #----------------
-  #discount at 7%
-  #at the moment we are NOT discounting the emissions savings (not sure how this works)
-  overall_discounted_7 <- discount(overall_summary,
-                                   rate = 0.07)
+  overall_discounted_0 <- discount(overall_summary, rate = 0)
+
+  overall_discounted_0 <- summarise_fes_results(overall_discounted_0) %>%
+    mutate(scenario = "discount_0_perc")
 
 
-  overall_discounted_7_summary <- overall_discounted_7 %>%
-    summarise(additional_cost = sum(additional_cost),
-              emissions_savings = sum(emissions_savings),
-              fuel_cost_savings = sum(fuel_cost_savings)) %>%
-    mutate(bcr_co2_excluded = fuel_cost_savings/additional_cost,
-           bcr_co2_20_dollar = (fuel_cost_savings + emissions_savings * 20) / additional_cost,
-           bcr_co2_35_dollar = (fuel_cost_savings + emissions_savings * 35) / additional_cost,
-           abatement_cost = (additional_cost - fuel_cost_savings)/emissions_savings) %>%
+  overall_discounted_7 <- discount(overall_summary,rate = 0.07)
+
+  overall_discounted_7 <- summarise_fes_results(overall_discounted_7) %>%
     mutate(scenario = "discount_7_perc")
 
 
-  #---------------------
-  #now discounting at 3%
-  overall_discounted_3 <- discount(overall_summary,
-                                   rate = 0.03)
+  overall_discounted_3 <- discount(overall_summary, rate = 0.03)
 
-
-  overall_discounted_3_summary <- overall_discounted_3 %>%
-    summarise(additional_cost = sum(additional_cost),
-              emissions_savings = sum(emissions_savings),
-              fuel_cost_savings = sum(fuel_cost_savings)) %>%
-    mutate(bcr_co2_excluded = fuel_cost_savings/additional_cost,
-           bcr_co2_20_dollar = (fuel_cost_savings + emissions_savings * 20) / additional_cost,
-           bcr_co2_35_dollar = (fuel_cost_savings + emissions_savings * 35) / additional_cost,
-           abatement_cost = (additional_cost - fuel_cost_savings)/emissions_savings) %>%
+  overall_discounted_3 <- summarise_fes_results(overall_discounted_3) %>%
     mutate(scenario = "discount_3_perc")
 
 
-  #---------------------------------------
-  #POOLING TOGETHER RESULTS
-  result <- bind_rows(undiscounted_summary,
-                      overall_discounted_3_summary,
-                      overall_discounted_7_summary) %>%
-    relocate(scenario)
 
 
+  #Pooling results --------------------------------------------------------
+  result <- bind_rows(overall_discounted_7,
+                      overall_discounted_3,
+                      overall_discounted_0) %>%
+    relocate(scenario, abatement_cost) %>%
+    pivot_longer(cols = (8:10),
+                 values_to = "bcr",
+                 names_to = "co2_value") %>%
+    mutate(npv = case_when(
+      co2_value == "bcr_co2_excluded" ~ npv_co2_excluded_m,
+      co2_value == "bcr_co2_20_dollar" ~ npv_co2_20_dollar_m,
+      co2_value == "bcr_co2_35_dollar" ~ npv_co2_35_dollar_m),
 
+      co2_value = case_when(
+        co2_value == "bcr_co2_excluded" ~ 0,
+        co2_value == "bcr_co2_20_dollar" ~ 20,
+        co2_value == "bcr_co2_35_dollar" ~ 35)) %>%
+    select(scenario, co2_value, bcr, npv, abatement_cost, emissions_savings, fuel_cost_savings, additional_cost, co2_value_20, co2_value_35) %>%
+    mutate(emissions_savings = emissions_savings / 1000000)
 
   return(result)
 
