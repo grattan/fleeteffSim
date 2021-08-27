@@ -7,6 +7,8 @@
 \item{bau_benefits}{the bau_benefits data}
 
 \item{target_benefits}{the target benefits data}
+
+\item{cars}{the number of cars in the base year of the simulation run}
 }
 \value{
 summarised results

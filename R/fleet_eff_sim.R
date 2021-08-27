@@ -204,7 +204,8 @@ fleet_eff_sim <- function(#cost model inputs
 
   #putting it all together to get the results
   results <- generate_results(bau_benefits = .bau_done,
-                              target_benefits = .target_done)
+                              target_benefits = .target_done,
+                              cars = .in_cars)
 
 
   return(results)

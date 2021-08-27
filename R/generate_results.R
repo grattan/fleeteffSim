@@ -77,6 +77,7 @@ summarise_fes_results <- function(.data) {
 #'
 #' @param bau_benefits the bau_benefits data
 #' @param target_benefits the target benefits data
+#' @param cars the number of cars in the base year of the simulation run
 #'
 #' @return summarised results
 #'
@@ -90,7 +91,8 @@ globalVariables(c("vehicle_age", "cost", "fuel_cost", "additional_cost",
 
 
 generate_results <- function(bau_benefits,
-                             target_benefits) {
+                             target_benefits,
+                             cars) {
 
   #pulling the data together from th bau and target summary
   bau_summary <- bau_benefits %>%
@@ -102,18 +104,18 @@ generate_results <- function(bau_benefits,
     #scale this to the whole fleet size. This is used instead of summing as the number
     #of cars in the simulated fleet can change in different model runs if specified by
     #the user.
-    summarise(cost = sum(cost * 11000),
-              total_emissions = sum(total_emissions * 11000),
-              fuel_cost = sum(fuel_cost * 11000))
+    summarise(cost = sum(cost * 1100000 / cars),
+              total_emissions = sum(total_emissions *  1100000 / cars),
+              fuel_cost = sum(fuel_cost *  1100000 / cars))
 
 
   target_summary <- target_benefits %>%
     filter(vehicle_age <= 17,
            year > 2021) %>%
     group_by(year) %>%
-    summarise(cost = sum(cost * 11000),
-              total_emissions = sum(total_emissions * 11000),
-              fuel_cost = sum(fuel_cost * 11000))
+    summarise(cost = sum(cost *  1100000 / cars),
+              total_emissions = sum(total_emissions *  1100000 / cars),
+              fuel_cost = sum(fuel_cost *  1100000 / cars))
 
 
   #combining this to get the additionality of each we're interested in

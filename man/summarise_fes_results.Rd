@@ -7,7 +7,7 @@
 summarise_fes_results(.data)
 }
 \arguments{
-\item{.data}{}
+\item{.data}{The input data to be summarised}
 }
 \value{
 A \code{tibble} with summarised results fora given discount rate scenario
