@@ -50,7 +50,7 @@ exp_energy  <- energy_rate(.rate = 1.02, .energy_cost = energy_cost) %>%
 #and an off-peak charging scenario with a steady but lower price (e.g. charging overnight)
 night <- energy_cost %>%
   select(-energy_price) %>%
-  mutate(scenario = "off-peak",
+  mutate(scenario = "off_peak",
          energy_price = 0.20)
 
 #now binding all three together

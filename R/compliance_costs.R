@@ -5,9 +5,10 @@
 #' @description Compliance costs
 #'
 #' @param .fleet The simulated fleet of new vehicle sales until 2050
-#' @param .target The input target of a fleetwide efficiency standard to be evaluated or a business as usual trajectory
+#' @param .target The target type selected from \code{targets_and_bau} for the compliance cost run. Options include
+#' "target_central", "bau", "target_linear", "target_ambitious".
 #' @param .cost_curves The assumed cost curves for al vehicle types
-#' @param .estimate The cost curves estimate type
+#' @param .cost_curve_estimate The cost curves estimate type
 #' @param .suv_existing_tech The assumed existing technology for SUVs
 #' @param .passenger_existing_tech The assumed existing technology for passenger vehicles
 #' @param .lcv_existing_tech The assumed existing technology for LCVs
@@ -30,11 +31,11 @@ globalVariables(c("fleet", "target", "cost_curves", "passenger",
 
 
 
-compliance_costs <- function(.fleet = fleet,
+compliance_costs <- function(.fleet,
                              .target_file = targets_and_bau,
-                             .target_scenario = "target_central",
+                             .target_scenario,
                              .cost_curves = cost_curves,
-                             .estimate = "central",
+                             .cost_curve_estimate = "central",
                              .suv_existing_tech = 20,
                              .passenger_existing_tech = 13,
                              .lcv_existing_tech = 15,
@@ -57,17 +58,17 @@ compliance_costs <- function(.fleet = fleet,
 
   .cost_curves <- bind_rows(add_existing_technology(.type = "suv",
                                                     .existing_tech = .suv_existing_tech,
-                                                    .estimate = .estimate,
+                                                    .estimate = .cost_curve_estimate,
                                                     .cost_curves = cost_curves),
                             add_existing_technology(.type = "passenger",
                                                     .existing_tech = .passenger_existing_tech,
-                                                    .estimate = .estimate,
+                                                    .estimate = .cost_curve_estimate,
                                                     .cost_curves = cost_curves),
                             add_existing_technology(.type = "lcv",
                                                     .existing_tech = .lcv_existing_tech,
-                                                    .estimate = .estimate,
+                                                    .estimate = .cost_curve_estimate,
                                                     .cost_curves = cost_curves)) %>%
-    filter(estimate == .estimate)
+    filter(estimate == .cost_curve_estimate)
 
 
 

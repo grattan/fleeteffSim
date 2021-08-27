@@ -19,7 +19,7 @@
 #' @param .in_bau_scenario Defaults to "bau". The assumed trajectory of the fleet standard from those contained in
 #' \code{.in_target_file}
 #' @param .in_cost_curves Defaults to "cost curves". The assumed costs of improving vehicle efficiency by year and vehicle type.
-#' @param .in_estimate Defaults to "central". The estimate scenario used from the \code{cost_curves} scenarios. Options are "central",
+#' @param .in_cost_curve_estimate Defaults to "central". The estimate scenario used from the \code{cost_curves} scenarios. Options are "central",
 #' "pp_late", "pp_early".
 #' @param .in_suv_existing_tech Defaults to 20. The percentage assumed efficiency improvement of a base model new SUV vehicle when compared to
 #' a I4 petrol engine (assumed as 2008 base model equivalent)
@@ -58,6 +58,9 @@ globalVariables()
 fleet_eff_sim <- function(#cost model inputs
                         .fleet_creator = TRUE,
                         .in_cars = 100,
+                        .in_run_costs = TRUE,
+                        .in_bau_compliant,
+                        .in_fleet_compliant,
                         .input_fleet,
                         .in_target_file = targets_and_bau,
                         .in_target_scenario = "target_central",
@@ -96,20 +99,44 @@ fleet_eff_sim <- function(#cost model inputs
   if (.fleet_creator == TRUE) {
     .in_fleet <- fleet_creator(.i_cars = .in_cars)
   } else {
-    .in_fleet <- .input_fleet
+
+    if(missing(.input_fleet)) {
+
+      message(red(".fleet_creator was specified as FALSE, but no input fleet was provided by the .in_fleet argument"))
+      stop()
+
+    } else {
+      .in_fleet <- .input_fleet
+    }
   }
 
+
+
+  if (.in_run_costs == FALSE & missing(.in_bau_compliant)) {
+    message(red(".in_run_costs was specified as FALSE, but no compliant BAU fleet was provided by the .in_bau_compliant_argument."))
+    stop()
+  } else if (.in_run_costs == FALSE & missing(.in_bau_compliant)) {
+
+    message(red(".in_run_costs was specified as FALSE, but no compliant target fleet was provided by the .in_fleet_compliant argument"))
+    stop()
+
+  }
+
+
+  if(.in_run_costs == TRUE) {
 
   #first running the costs side of model for the target
   .target_compliant <- compliance_costs(.fleet = .in_fleet,
                                         .target_file = .in_target_file,
                                         .target_scenario = .in_target_scenario,
                                         .cost_curves = .in_cost_curves,
-                                        .estimate = .in_cost_curves_estimate,
+                                        .cost_curve_estimate = .in_cost_curves_estimate,
                                         .suv_existing_tech = .in_suv_existing_tech,
                                         .passenger_existing_tech = .in_passenger_existing_tech,
                                         .lcv_existing_tech = .in_lcv_existing_tech,
                                         .run_to_year = .in_run_to_year)
+
+  #this gives the option of not re-running the bau for the cost scenario repeatedly if not required
 
 
   #and now running costs for the BAU scenario
@@ -117,11 +144,18 @@ fleet_eff_sim <- function(#cost model inputs
                                         .target_file = .in_target_file,
                                         .target_scenario = .in_bau_scenario,
                                         .cost_curves = .in_cost_curves,
-                                        .estimate = .in_cost_curves_estimate,
+                                        .cost_curve_estimate = .in_cost_curves_estimate,
                                         .suv_existing_tech = .in_suv_existing_tech,
                                         .passenger_existing_tech = .in_passenger_existing_tech,
                                         .lcv_existing_tech = .in_lcv_existing_tech,
                                         .run_to_year = .in_run_to_year)
+
+  } else {
+
+    .bau_compliant <- .in_bau_compliant
+    .target_compliant <- .in_fleet_compliant
+
+  }
 
 
 

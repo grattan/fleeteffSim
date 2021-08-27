@@ -24,7 +24,7 @@ is unlikely to yield significantly different results. For example, the BCR in si
 
 \item{.in_cost_curves}{Defaults to "cost curves". The assumed costs of improving vehicle efficiency by year and vehicle type.}
 
-\item{.in_estimate}{Defaults to "central". The estimate scenario used from the \code{cost_curves} scenarios. Options are "central",
+\item{.in_cost_curve_estimate}{Defaults to "central". The estimate scenario used from the \code{cost_curves} scenarios. Options are "central",
 "pp_late", "pp_early".}
 
 \item{.in_suv_existing_tech}{Defaults to 20. The percentage assumed efficiency improvement of a base model new SUV vehicle when compared to

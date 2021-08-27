@@ -6,11 +6,12 @@
 \arguments{
 \item{.fleet}{The simulated fleet of new vehicle sales until 2050}
 
-\item{.target}{The input target of a fleetwide efficiency standard to be evaluated or a business as usual trajectory}
+\item{.target}{The target type selected from \code{targets_and_bau} for the compliance cost run. Options include
+"target_central", "bau", "target_linear", "target_ambitious".}
 
 \item{.cost_curves}{The assumed cost curves for al vehicle types}
 
-\item{.estimate}{The cost curves estimate type}
+\item{.cost_curve_estimate}{The cost curves estimate type}
 
 \item{.suv_existing_tech}{The assumed existing technology for SUVs}
 
