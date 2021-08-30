@@ -22,6 +22,8 @@
 #' @importFrom tidyr complete
 #' @importFrom dplyr rename
 #' @importFrom dplyr inner_join
+#' @importFrom dplyr rowwise
+
 
 
 #' @import crayon

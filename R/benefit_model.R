@@ -31,7 +31,8 @@ globalVariables(c("compliant_fleet", "km_travelled", "fuel_prices",
                   "electricity_prices", "energy_consumption", "energy_intensity",
                   "year", "fuel_type", "diesel_share", "purchase_year", "price",
                   "vehicle_type", "age", "current_emissions", "total_emissions",
-                  "electric_applied"))
+                  "electric_applied", "price_91", "current_cost_100km",
+                  "base_cost_100km", "km_driven", "rebound_factor"))
 
 
 
