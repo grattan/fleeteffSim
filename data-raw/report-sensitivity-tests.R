@@ -423,7 +423,7 @@ all_results %>%
   ggplot(aes(y = run_type, x = abatement_cost, colour = target_type)) +
   geom_col(position = position_dodge(0.7), width = 0.05) +
   geom_vline(xintercept = 0, colour = grattan_grey4, size = 1) +
-  geom_point(size = 5, position = position_dodge(0.7)) +
+  geom_point(size = 3.5, position = position_dodge(0.7)) +
   scale_x_continuous(limits = c(-80, 50)) +
   theme_grattan(base_size = 12, legend = "top") +
   grattan_fill_manual() +
@@ -449,11 +449,12 @@ all_results %>%
                  colour = target_type,
                  size = emissions_savings),
              alpha = 0.9) +
+  scale_size(range = c(3, 7)) +
   coord_flip() +
   theme_grattan(legend = "top") +
   scale_y_continuous_grattan(limits = c(0, 35000)) +
   grattan_colour_manual() +
-  labs(title = "Under all tested scenarios, a fleetwide standard has very high NPNV",
+  labs(title = "Under all tested scenarios, a fleetwide standard has very high NPV",
        subtitle = "NPV ($ millions) of implementing a fleetwide standard")
 
 
@@ -476,6 +477,7 @@ all_results %>%
                  y = bcr,
                  colour = target_type,
                  size = emissions_savings)) +
+  scale_size(range = c(3, 7)) +
   coord_flip() +
   theme_grattan(legend = "top") +
   scale_y_continuous_grattan(limits = c(0, 8)) +

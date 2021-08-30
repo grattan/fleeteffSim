@@ -181,7 +181,7 @@ benefit_model <- function(.fleet,
 
       #this bit will assign the fuel type to a vehicle based on expected proportions (i.e. petrol/diesel)
       #for the moment that data isn't there so we're just assuming all is petrol
-      #also use this to assign the types of ptrol etc.
+      #also use this to assign the types of petrol etc.
       mutate(fuel_type = fcase(
         electric_applied == FALSE , fuel_type,
         electric_applied == TRUE , "electric"))
@@ -259,6 +259,30 @@ benefit_model <- function(.fleet,
 
   all_fleet <- inner_join(all_fleet, km_travelled,
                           by = c("vehicle_group", "vehicle_age"))
+
+
+  #however, we need to adjust these km_driven figures to account for the rebound effect
+  #to do this, we need to calculate the running costs per 100km for each upgraded vehicle compared
+  #to the 'base model', which we assume has the km_driven figures already applied.
+
+  #because the ratio would be the same regardless of the fuel type (as we're dealing with
+  #efficiency, for simplicity we pretend all the vehicles are either 'petrol' (petrol_91)
+  #or electric)
+
+  all_fleet <- all_fleet %>%
+    #cost per 100km for base vehicle
+    mutate(base_cost_100km = price_91 * petrol_co2_to_fuel(base_emissions * .gap)) %>%
+
+    #cost per 100 km upgraded vehicle
+    mutate(current_cost_100km = case_when(
+      electric_applied == TRUE ~ energy_consumption * 100 * energy_price,
+      (electric_applied == FALSE)  ~ price_91 * petrol_co2_to_fuel(current_emissions * .gap))) %>%
+
+    #using the difference in runing costs to update km travelled with an elasticity of 0.1
+    #this assumes a 1% running cost decrease increases driving distance by 0.1%
+    rowwise() %>%
+    mutate(rebound_factor = ((1 - (current_cost_100km / base_cost_100km)) * 10) + 100,
+           km_driven = km_driven * (rebound_factor / 100))
 
 
   #now creating a column for fuel consumption
