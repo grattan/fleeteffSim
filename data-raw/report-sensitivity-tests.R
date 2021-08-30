@@ -380,81 +380,108 @@ all_results <- bind_rows(all_central_results,
                          all_ambitious_results)
 
 
-write_rds(all_results, "data-raw/report_sensitivity_results.rds")
+#write_rds(all_results, "data-raw/report_sensitivity_results.rds")
 
-
+all_results <- read_rds("data-raw/report_sensitivity_results.rds")
 
 
 # Plotting results --------------------------------------------------------
 
+#formatting data
+all_results <- all_results %>%
+  mutate(run_type = case_when(
+    run_type == "off_peak_elec" ~ "Off peak electricity",
+    run_type == "low_ice_costs" ~ "Low cost ICE CO2 reduction",
+    run_type == "low_fuel" ~ "Low future fuel price",
+    run_type == "low_elec" ~ "Low future electricity price",
+    run_type == "late_pp" ~ "EV price parity delayed one year",
+    run_type == "high_ice_costs" ~ "High cost ICE CO2 reduction",
+    run_type == "high_fuel" ~ "High future fuel costs",
+    run_type == "high_elec" ~ "High future electricity price",
+    run_type == "gap_1_3" ~ "Increased real world 'gap'",
+    run_type == "early_pp" ~ "EV price parity one year early",
+    run_type == "central" ~ "Central scenario")) %>%
+  mutate(target_type = factor(target_type,
+                              levels = c("linear", "central",
+                                         "ambitious")))
 
 
+
+
+#Abatement cost
 all_results %>%
+  mutate(run_type = factor(run_type, levels = all_results %>%
+                             filter(target_type == "ambitious") %>%
+                             arrange(abatement_cost) %>%
+                             pull(run_type) %>%
+                             unique())) %>%
+  filter(scenario == "discount_7_perc",
+         co2_value == 0) %>%
   mutate(colour = case_when(
     abatement_cost >= 0 ~ "above 1",
     abatement_cost < 0 ~ "below 1")) %>%
-  filter(scenario == "discount_7_perc") %>%
   ggplot(aes(y = run_type, x = abatement_cost, colour = target_type)) +
-  geom_col(width = 0.05, position = "dodge") +
+  geom_col(position = position_dodge(0.7), width = 0.05) +
   geom_vline(xintercept = 0, colour = grattan_grey4, size = 1) +
-  geom_point(size = 5) +
-  scale_x_continuous(limits = c(-50, 50)) +
-  theme_grattan() +
+  geom_point(size = 5, position = position_dodge(0.7)) +
+  scale_x_continuous(limits = c(-80, 50)) +
+  theme_grattan(base_size = 12, legend = "top") +
   grattan_fill_manual() +
   grattan_colour_manual() +
   labs(title = "Under all tested scenarios, a fleetwide standard provides cheap abatement",
        subtitle = "Cost of abatement ($/t CO2) of implementing a fleetwide standard")
 
 
+
+#NPV chart ($35)
+
 all_results %>%
-  filter(scenario == "discount_7_perc") %>%
+  mutate(run_type = factor(run_type, levels = all_results %>%
+                             filter(target_type == "ambitious") %>%
+                             arrange(desc(npv)) %>%
+                             pull(run_type) %>%
+                             unique())) %>%
+  filter(scenario == "discount_7_perc",
+         co2_value == 35) %>%
   ggplot() +
-  geom_point(aes(x = run_type, y = bcr_co2_excluded, colour = target_type)) +
+  geom_point(aes(x = run_type,
+                 y = npv,
+                 colour = target_type,
+                 size = emissions_savings),
+             alpha = 0.9) +
   coord_flip() +
   theme_grattan(legend = "top") +
-  scale_y_continuous_grattan(limits = c(0, 4)) +
+  scale_y_continuous_grattan(limits = c(0, 35000)) +
+  grattan_colour_manual() +
+  labs(title = "Under all tested scenarios, a fleetwide standard has very high NPNV",
+       subtitle = "NPV ($ millions) of implementing a fleetwide standard")
+
+
+
+
+# BCR chart
+
+all_results %>%
+  mutate(run_type = factor(run_type, levels = all_results %>%
+                             filter(target_type == "central",
+                                    scenario == "discount_7_perc",
+                                    co2_value == 0) %>%
+                             arrange(desc(bcr)) %>%
+                             pull(run_type) %>%
+                             unique())) %>%
+  filter(scenario == "discount_7_perc",
+         co2_value == 0) %>%
+  ggplot() +
+  geom_point(aes(x = run_type,
+                 y = bcr,
+                 colour = target_type,
+                 size = emissions_savings)) +
+  coord_flip() +
+  theme_grattan(legend = "top") +
+  scale_y_continuous_grattan(limits = c(0, 8)) +
   grattan_colour_manual() +
   labs(title = "Under all tested scenarios, a fleetwide standard has a BCR above 1",
        subtitle = "Cost of abatement ($/t CO2) of implementing a fleetwide standard")
 
 
-
-all_results %>%
-  filter(scenario == "discount_7_perc") %>%
-  ggplot(aes(x = target_type, y = bcr_co2_excluded, colour = target_type, fill = target_type)) +
-  geom_violin(draw_quantiles = c(0.5,0.25, 0.75), alpha = 0.1) +
-  geom_jitter(size = 6, alpha = 0.8,
-              height = 0, width = 0.15) +
-  scale_y_continuous_grattan(limits = c(-0, 5), breaks = c(0, 1, 2,3,4,5)) +
-  theme_grattan(chart_type = "scatter", legend = "top") +
-  #grattan_colour_manual(4) +
-  #grattan_fill_manual(4) +
-  labs(title = "Under a three-phase target, abatement costs are likely to be $0, or negative",
-       subtitle = "Costs of abatement ($/t) under various scenarios",
-       y = "CBR (CO2 at $20/t)",
-       x = "Discount rate applied (discrete)",
-       caption = "Data includes a central estimate, high/low fuel price estimate, high/low
-       electricity price estimates, and high/low test-real world gap estimate")
-
-
-
-all_results %>%
-  mutate(npv_millions = 1100 * (fuel_cost_savings - additional_cost) * 28 / 1000000) %>%
-  filter(scenario == "discount_7_perc") %>%
-  ggplot(aes(x = target_type, y = npv_millions, colour = target_type, fill = target_type)) +
-  geom_violin(draw_quantiles = c(0.5,0.25, 0.75), alpha = 0.1) +
-  geom_jitter(size = 6, alpha = 0.8,
-              height = 0, width = 0.15) +
-  scale_y_continuous_grattan(limits = c(0, 40)) +
-  theme_grattan(chart_type = "scatter", legend = "top") +
-  #grattan_colour_manual(4) +
-  #grattan_fill_manual(4) +
-  labs(title = "Under a three-phase target, abatement costs are likely to be $0, or negative",
-       subtitle = "Costs of abatement ($/t) under various scenarios",
-       y = "CBR (CO2 at $20/t)",
-       x = "Discount rate applied (discrete)",
-       caption = "Data includes a central estimate, high/low fuel price estimate, high/low
-       electricity price estimates, and high/low test-real world gap estimate") +
-  grattan_colour_manual() +
-  grattan_fill_manual()
 
