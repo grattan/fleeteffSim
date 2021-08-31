@@ -36,9 +36,9 @@ compliance_costs <- function(.fleet,
                              .target_scenario,
                              .cost_curves = cost_curves,
                              .cost_curve_estimate = "central",
-                             .suv_existing_tech = 20,
-                             .passenger_existing_tech = 13,
-                             .lcv_existing_tech = 15,
+                             .suv_existing_tech = 26,
+                             .passenger_existing_tech = 22,
+                             .lcv_existing_tech = 18,
                              .run_to_year = 2050) {
 
 

@@ -95,15 +95,15 @@ gap_1_3 <- fleet_eff_sim(.in_run_costs = FALSE,
 #scenarios that need to run the cost model again --------------------------
 
 #high ICE costs (added 10 to existing tech baselines, might be very high)
-high_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 23,
-                                .in_suv_existing_tech = 30,
-                                .in_passenger_existing_tech = 23) %>%
+high_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 28,
+                                .in_suv_existing_tech = 36,
+                                .in_passenger_existing_tech = 32) %>%
   mutate(run_type = "high_ice_costs")
 
 #low ICE costs (subtracted 5 to existing tech baselines, might be very high)
-low_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 8,
-                                .in_suv_existing_tech = 15,
-                                .in_passenger_existing_tech = 8) %>%
+low_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 13,
+                                .in_suv_existing_tech = 21,
+                                .in_passenger_existing_tech = 17) %>%
   mutate(run_type = "low_ice_costs")
 
 #PP early
@@ -210,16 +210,16 @@ all_central_results <- bind_rows(central,
   #scenarios that need to run the cost model again --------------------------
 
   #high ICE costs (added 10 to existing tech baselines, might be very high)
-  lin_high_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 23,
-                                      .in_suv_existing_tech = 30,
-                                      .in_passenger_existing_tech = 23,
+  lin_high_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 28,
+                                      .in_suv_existing_tech = 36,
+                                      .in_passenger_existing_tech = 32,
                                       .in_target_scenario = "target_linear") %>%
     mutate(run_type = "high_ice_costs")
 
   #low ICE costs (subtracted 5 to existing tech baselines, might be very high)
-  lin_low_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 8,
-                                     .in_suv_existing_tech = 15,
-                                     .in_passenger_existing_tech = 8,
+  lin_low_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 13,
+                                     .in_suv_existing_tech = 21,
+                                     .in_passenger_existing_tech = 17,
                                      .in_target_scenario = "target_linear") %>%
     mutate(run_type = "low_ice_costs")
 
@@ -329,16 +329,16 @@ all_central_results <- bind_rows(central,
   #scenarios that need to run the cost model again --------------------------
 
   #high ICE costs (added 10 to existing tech baselines, might be very high)
-  amb_high_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 23,
-                                  .in_suv_existing_tech = 30,
-                                  .in_passenger_existing_tech = 23,
+  amb_high_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 28,
+                                  .in_suv_existing_tech = 36,
+                                  .in_passenger_existing_tech = 32,
                                   .in_target_scenario = "target_ambitious") %>%
     mutate(run_type = "high_ice_costs")
 
   #low ICE costs (subtracted 5 to existing tech baselines, might be very high)
-  amb_low_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 8,
-                                 .in_suv_existing_tech = 15,
-                                 .in_passenger_existing_tech = 8,
+  amb_low_ice_costs <- fleet_eff_sim(.in_lcv_existing_tech = 13,
+                                 .in_suv_existing_tech = 121,
+                                 .in_passenger_existing_tech = 17,
                                  .in_target_scenario = "target_ambitious") %>%
     mutate(run_type = "low_ice_costs")
 

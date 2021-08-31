@@ -67,9 +67,9 @@ fleet_eff_sim <- function(#cost model inputs
                         .in_bau_scenario = "bau",
                         .in_cost_curves = cost_curves,
                         .in_cost_curves_estimate = "central",
-                        .in_suv_existing_tech = 20,
-                        .in_passenger_existing_tech = 13,
-                        .in_lcv_existing_tech = 15,
+                        .in_suv_existing_tech = 26,
+                        .in_passenger_existing_tech = 22,
+                        .in_lcv_existing_tech = 18,
                         .in_run_to_year = 2050,
 
                         #benefit model inputs
