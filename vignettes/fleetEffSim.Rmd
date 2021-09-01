@@ -15,8 +15,18 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, eval=TRUE, include=FALSE}
+
+devtools::load_all()
+```
+
+``` {r, eval=FALSE, include=TRUE}
+
+#library(fleetEffSim)
+```
+
+
 ```{r setup}
-library(fleeteffSim)
 library(ggplot2)
 library(grattantheme)
 library(magrittr)
@@ -71,7 +81,7 @@ At their most complex, technology cost curves can be diaggregated into very spec
 
 An example cost curve is illustrated below. This is the cost curve used for passenger vehicles, in the year 2021, in the *fleetEffSim* model. 
 
-```{r}
+```{r, echo = FALSE}
 # Cost curve data
 cost_curves %>% 
   filter(year == 2021, 
@@ -138,7 +148,7 @@ Although this means that the cost curves produced are no longer specific to a te
 The costs of the aggregated data were converted in to Australian dollars (2021) from 2015 US dollars, adjusting for inflation.
 The resulting cost curves are as follows for 2021:
 
-```{r}
+```{r, echo = FALSE}
 # Cost curve data
 cost_curves %>% 
   filter(year == 2021,
@@ -229,24 +239,22 @@ The base costs provided by the US EPA in the OMEGA model are available here: (ht
 1.     6 - truck
 
 In order to aggregate these costs into the classes used in this analysis (passenger, LCV, SUV), we take sales weighted average of battery costs using the proportions discussed earlier in the creation of ICE cost curves.  
-I.e. 
+I.e.
 
-    |  Vehicle type       |   EPA type                              |   Type weighting (sales based)    |
-    |:--------------------|:----------------------------------------|:----------------------------------|
-    | 1 - small car       |     corresponds to EPA type 1 -         |    weight = 0.0793 (passenger)    |
-    | 2 - standard car    |     corresponds to EPA type 2 -         |    weight = 0.188  (passenger)    |
-    | 3 - large car       |     corresponds to EPA type 4 and 6 -   |    weight = 0.023  (passenger)    |
-    | 4 - small MPV       |     corresponds to EPA type 7 -         |    weight = 0.206 (suv)           |
-    | 5 - large MPV       |     corresponds to EPA type 8 -         |    weight = 0.153 (suv)           |
-    | 6 - truck           |     corresponds to EPA type 11 and 13 - |    weight = 0.351 (lcv)           |
+|  Vehicle type       |   EPA type                              |   Type weighting (sales based)    |
+|:--------------------|:----------------------------------------|:----------------------------------|
+| 1 - small car       |     corresponds to EPA type 1 -         |    weight = 0.0793 (passenger)    |
+| 2 - standard car    |     corresponds to EPA type 2 -         |    weight = 0.188  (passenger)    |
+| 3 - large car       |     corresponds to EPA type 4 and 6 -   |    weight = 0.023  (passenger)    |
+| 4 - small MPV       |     corresponds to EPA type 7 -         |    weight = 0.206 (suv)           |
+| 5 - large MPV       |     corresponds to EPA type 8 -         |    weight = 0.153 (suv)           |
+| 6 - truck           |     corresponds to EPA type 11 and 13 - |    weight = 0.351 (lcv)           |
      
 
 It is also assumed that from the US costs used, all EV vehicles are initially assumed to be BEV-200 (mile) vehicles, with approximately the following battery sizes:
 
-```
   passenger : ~45kWh
   suv       : ~60kWh
-```
 
 No EPA data is provided for class 6 (LCV's). 
 
@@ -331,7 +339,18 @@ The non-ev component of the fleet is assumed to decline in emissions intensity b
 
 The bau scenario is included in the `targets_and_bau` tableincluded in the *fleetEffSim* model, and is specified by the XX variable. 
 
-**put in a chart of trajectory here**
+
+```{r, echo = FALSE}
+targets_and_bau %>% 
+  filter(target_type == "bau") %>% 
+  ggplot() +
+  geom_line(aes(x = year, y = value)) +
+  theme_grattan() +
+  labs(title = "The assumed emissions trajectory under business as usual",
+       subtitle = "Average emissions of new vehicle sales (CO2g/km) over time",
+       x = "Year")
+
+```
 
 
 ### Target trajectory
@@ -346,12 +365,12 @@ To this point, this chapter has discussed variables used in the cost side of the
 
 However, many more variables are used as assumptions in the *fleetEffSim* model to estimate the benefits accrued through an emissions standard. This includes: 
 1. Distance travelled per year (`km_travelled`), including a rebound effect and vehicle life estimates
-1. Future fuel prices (`fuel_prices`)
-1. Future electricity prices (`electricity_prices`)
-1. Future energy consumption of electric vehicles (`energy_consumption`)
-1. The future energy intensity of the electricity grid (`energy_intensity`)
-1. The real world and test cycle emissions 'gap' 
-1. The proportions of vehicles that run on different fuels, including diesel and premium fuels
+2. Future fuel prices (`fuel_prices`)
+3. Future electricity prices (`electricity_prices`)
+4. Future energy consumption of electric vehicles (`energy_consumption`)
+5. The future energy intensity of the electricity grid (`energy_intensity`)
+6. The real world and test cycle emissions 'gap' 
+7. The proportions of vehicles that run on different fuels, including diesel and premium fuels
 
 The assumptions underpinning each of these variables is discussed below. 
 
@@ -367,9 +386,19 @@ To account for these factors in the model, the ABS data was used to plot a linea
 
 The resulting data is plotted below:
 
-``` {r} 
-
+``` {r, echo = FALSE}
 km_travelled %>% 
+  ggplot() +
+  geom_line(aes(x = age, y = km_travelled, colour = vehicle_type)) +
+  scale_x_continuous_grattan(limits = c(0, 17)) +
+  theme_grattan(legend = "top") +
+  labs(title = "The assumed distance driven by vehicle type and age",
+       subtitle = "Yearly km driven",
+       x = "Vehicle age",
+       y = "Yearly km driven",
+       caption = "Note that because distance is assumed equal for passenger and SVU types, the lines are on top of each other and therefore not both visible") +
+  grattan_colour_manual()
+  
   
 
 ```
