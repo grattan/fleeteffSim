@@ -23,6 +23,7 @@
 #' @importFrom dplyr rename
 #' @importFrom dplyr inner_join
 #' @importFrom dplyr rowwise
+#' @importFrom devtools load_all
 
 
 

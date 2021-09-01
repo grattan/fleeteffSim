@@ -22,7 +22,10 @@ Imports:
     tidyr,
     readr,
     testthat,
-    magrittr
+    magrittr,
+    ggplot2,
+    grattantheme,
+    devtools
 Depends: 
     R (>= 2.10)
 Suggests: 
