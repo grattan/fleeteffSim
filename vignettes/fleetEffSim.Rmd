@@ -377,24 +377,76 @@ km_travelled %>%
 
 Given that the data is not disaagregated between passenger and SUV vehicle types, the 'passenger' curve is assumed to apply to both passenger and SUV vehicles. 
 
+A rebound effect is also used in the *fleetEffSim* model, to account for how changes in vehicle running cost have previously been found to effect driving behaviour. When running costs of vehicles become cheaper, it is unsurprising that drivers have been found to drive, on average, further. This effect is known as a 'rebound' as a result of the low running costs. Typical estimates estimate a rebound elasticity of approximately 0.1-0.2, meaning that if running costs become 10% cheaper for a given vehicle, a given consumer is likely to drive 1-2% further on average. The *fleetEffSim* model uses a rebound elasticity of 0.1. 
+
 
 ### Future fuel prices 
+
+There is significant uncertainty in the future price of fuel, which is primarily a factor of future oil prices. To account for the uncertainty in forecasting fuel prices a far into the future, the inputs to the *fleetEffSim* model under the central estimate assume that fuel prices remain constant. This is is line with longer term real fuel costs that demonstrate fluctuations around a relatively steady price, as outlined by the ACCC: https://www.accc.gov.au/system/files/20-27RPT_Petrol%2520Quarterly%2520Report%2520-%2520June%25202020_FA.pdf. 
+
+The fuel costs used in the *fleetEffSim* model are not consumer level fuel costs. Instead, they are stripped consumer level fuel costs, minus taxes applied to fuel (GST and fuel excise). Information regarding fuel taxation can be found here: https://data.gov.au/data/dataset/excise-data/resource/b9227cdf-4c04-492d-bd84-65031adc408e. This is due to the fact that the *fleetEffSim* model represents a society-level scenario, and not a consumer level scenario. Although consumers may pay taxes in their fuel, incurring a cost, this is a net-transfer to government. Thus, a requirement for less fuel also generates less revenue for government. 
+
+The fuel price for 91-octane under the central scenario is assumed to remain steady at \$0.913/L (without taxes). Data on the price difference between octane-91 , 95 and 98 was tken from RACV data: https://www.racv.com.au/royalauto/moving/news-information/premium-petrol-guzzling-cash.html. Under a central scenario, diesel is assumed to remain steady at \$0.967/L, oct-95 at \$0.990/L, and oct-98 at \$1.04/L. 
+
+The significant uncertainty in future fuel prices is dealt with through sensitivity testing. Two other scenarios are included in the `fuel_prices` data, under the `scenario` variable. This includes a `low_price` and `high_price` estimate. The low price estimate assumes the same initial 2021 costs as the central estimate, however prices fall by 1% annually between 2021 and 2050. For oct-91, this results in a 2050 price of \$0.668/L. The `high_price` estimate assumes fuel prices rise by 1% annually. For oct-91, this results in a 2050 price of \$1.24/L. 
+
+
+### Vehicle fuel types  
+
+Of new vehicle sales in Australia, in a given year a proportion of vehicles are sold designed to run on fuels aside from octane-91 petrol. These alternative fuels, such as diesel or premium blends, have different costs and may translate to different performance. 
+
+The RACV estimates that approximately 20 % of new vheicles sold run on premium fuel (https://www.racv.com.au/royalauto/moving/news-information/premium-petrol-guzzling-cash.html) (as of 2019). In the *fleetEffSim* model, it is assumed (through the default arguments of the variables ` .in_premium_95` and `.in_premium_98`) that 15% of non-electric vehicles run on octane 95 fuel, and 5% run on octane-98 or other premium blend fuel. These proportions are held constant across BAU and target trajectories in all years, given the high uncertainty surrounding how emissions standards may effect these figures. 
+
+The proportion of vehicles assumed to run on diesel is determined based on data from: https://fleetautonews.com.au/new-car-sales-by-fuel-type-fleet-buyers, and is dependent on vehicle type. the arguments `.in_passenger_diesel`, `.in_suv_diesel` and `.in_lcv_diesel` specify the diesel proportions in each segment and can be changed by the user, however have the default arguments (as a proportion) of 0.02, 0.21 and 0.92 respectively. 
 
 
 ### Future electricity prices
 
+Similarly to fuel price forecasts, there is significant uncertainty in future consumer level electricity prices. This is particularly true given the large daily and weekly variation in electricity costs (based on peak/off-peak usage times), and the uncertainty around charging behaviour of users with electric vehicles. 
+
+To account for this, the 'central' scenario assumes a conservative future electricity price of /$0.27kW to remain steady. Although this forecast is in line with current average electricity prices (as outlined here: 
+https://www.aemc.gov.au/sites/default/files/2020-12/2020%20Residential%20Electricity%20Price%20Trends%20report%20-%2015122020.pdf), it is likely to exceed actual prices used for vehicle charging. This is because it is likely that vehicle charging will predominantly occur at off peak times, such as overnight, where prices tend to be lower. A conservative estimate of future electricity prices underestimates the benefits of an emissions standard policy. 
+
+Like for future fuel prices, options for sensitivity testing are included in the *fleetEffSim* model, under the `scenario` variable in the `electricity_price` data. Alternative scenarios included are `high_price`, where electricity prices are assumed to increase by 2% per year to 2031, before remaining steady; a low price scenario, where prices are assumed to drop by 1% per year to 2030, before remaining steady, and an `off_peak` charging scenario, where prices are assumed to remain steady at $0.20kW over the entire forecast period.  
+
+Through the `fleet_eff_sim()` function, the scenario can be specified using the ` .in_electricity_scenario` variable (default is "central"). In the `benefit_model()` function, the scenario can be specified by `.electricity_scenario`.
+
+
 
 ### Future electricity consumption of electric vehicles 
+
+To determine how much electricity is used by an electric vehicle, and thus the running costs for that vehicle, an estimate of EV energy consumption must be included in the model. This variable is assumed to vary by vehicle type, over time, with the rates of change over time assumed to broadly follow ICCT estimates (https://theicct.org/sites/default/files/publications/EV_cost_2020_2030_20190401.pdf). 
+
+The ICCT provides estimates of electric vehicle energy consumption in the years 2018 and 2030. Similarly to the estimates made in scaling vehicle costs, the data provided by the ICCT does not perfectly fit into the categories used by the *fleetEffSim* model. As a result, a sales weighted average of the ICCT categories corresponding to crossover and SUV vehicles is used to determine the energy consumption for SUV vehicle in this model. The weights used are 20 for crossover vehicles, and 15 for SUV's. 
+
+Once weighted and converted from kWh/mile to kWh/km, the values provided are as follows:
+
+| type        |   2018 kWh/mile    |  2030 kWh/mile  |
+|:------------|:-------------------|:----------------|
+| passenger   |   0.186            |  0.17           |
+| suv         |   0.26             |  0.24           |
+
+
+Given the *fleetEffSim* requires an energy consumption value for all years, not only 2018 and 2030, these values are used to esimate a rate of change for energy consumption over time, corresponding to -0.00133kWh/year for passenger vehicles, and -0.00166kWh/year for SUVs.
+
+To follow the conservative approach of the *fleetEffSim* model, a value of -0.0015kWh/year is used to estimate the change in energy consumption of SUVs over time, and -0.001kWh/year for passenger vehicles. It is also assumed that this rate of improvement only continues to 2030, beyond which the energy consumption remains stable. This is also used to account for a likely continuing trend towards consumer buying larger vehicles, with high energy demands. Given there is a lack of data for LCV vehicles, it is assumed that LCV vehicles require the same energy consumption as SUV vehicles. 
+
 
 
 ### Future emissions intensity of the electricity grid 
 
+Although the bulk of emissions from vehicles are likely to come from ICE vehicles, it is important to factor in the emissions created through electricity generation to power EV vehicles into the model. To do so, the *fleetEffSim* model uses the AEMO "step change" scenario to estimate the emissions intensity of the electricity grid. Although this scenario only applies to the NEM, given this covers the vast majority of vehicle users, it is used to estimate the trajectory for all Australians. 
+
+Further, the AEMO figures only include projections to 2040. Beyond this point, it is assumed that the electricity continues to decarbonise on a linear trajectory from the emissions intensity level in the final year of AEMO data, to 0 gCO2/kWh in 2050. 
+
 
 ### Real world and test cycle emissions 'gap'
 
+Internationally, emissions test cycles uhave routinely been used to enforce vehicle emissions standards. However, as manufacturers have aimed to meet their targets, they tended to optimise their vehicle performance for the test cycle, as opposed to real world driving conditions. The result is that a 'gap' has emerged between test cycle CO2 figures and real world driving conditions, which reduce the amount of CO2 abated from vehicle emissions standard policies. 
 
-### Vehicle fuels 
+This has been extensiely documented by various groups, including the ICCT in their 'laboratory to road' series (https://theicct.org/series/laboratory-road). The gap for the emissions cycle test used throughout Europe, the 'New European Driving Cycle (NEDC)' has risen substantially over the past decade, leading to a switch in testing model to the more rigorous World harmonised Light vehicle Testing Procedure (WLTP). the switch to the testing procedure has reduced the expected gap between real world and test cycle emissions. Over the coming years, Australia is also likely to adopt the WLTP test cycle to enforce compliance with any emissoins policies introduced. 
 
+Although estimates of the gap under the WLTP cycle have a wide range of variability, this model uses a default argument of a 20% gap, as specified by the `.in_gap` variable in the `fleet_eff_sim()` function, or the `.gap` variable in the `benefit_model()` function. For this variable, a 20% gap corresponds toa figure of 1.2, and 30% to 1.3 etc. This figure can be changed by the user to reflect the uncertainty, and should be used for sensitivity testing. 
 
 
 

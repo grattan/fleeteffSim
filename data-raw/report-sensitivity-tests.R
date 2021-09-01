@@ -414,7 +414,9 @@ all_results %>%
                              filter(target_type == "ambitious") %>%
                              arrange(abatement_cost) %>%
                              pull(run_type) %>%
-                             unique())) %>%
+                             unique()),
+         target_type = factor(target_type,
+                              levels = c("linear", "central", "ambitious"))) %>%
   filter(scenario == "discount_7_perc",
          co2_value == 0) %>%
   mutate(colour = case_when(
@@ -423,7 +425,8 @@ all_results %>%
   ggplot(aes(y = run_type, x = abatement_cost, colour = target_type)) +
   geom_col(position = position_dodge(0.7), width = 0.05) +
   geom_vline(xintercept = 0, colour = grattan_grey4, size = 1) +
-  geom_point(size = 3.5, position = position_dodge(0.7)) +
+  geom_point(position = position_dodge(0.7),
+             aes(size = emissions_savings)) +
   scale_x_continuous(limits = c(-80, 50)) +
   theme_grattan(base_size = 12, legend = "top") +
   grattan_fill_manual() +
@@ -477,10 +480,16 @@ all_results %>%
                  y = bcr,
                  colour = target_type,
                  size = emissions_savings)) +
+  geom_hline(yintercept = 1,
+             colour = grattan_grey4,
+             size = 0.8,
+             linetype = "dashed",
+             alpha = 0.8) +
   scale_size(range = c(3, 7)) +
   coord_flip() +
   theme_grattan(legend = "top") +
-  scale_y_continuous_grattan(limits = c(0, 8)) +
+  scale_y_continuous_grattan(limits = c(0, 8),
+                             breaks = c(0, 1, 2, 4, 6, 8)) +
   grattan_colour_manual() +
   labs(title = "Under all tested scenarios, a fleetwide standard has a BCR above 1",
        subtitle = "Cost of abatement ($/t CO2) of implementing a fleetwide standard")

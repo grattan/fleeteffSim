@@ -39,7 +39,7 @@ source("data-raw/model_data/00-setup.R")
 # suv         :   0.26             :  0.24
 
 
-#From these figures we get that the 2017 base rae for each is as above, and the rate
+#From these figures we get that the 2017 base rate for each is as above, and the rate
 #of improvement for each is:
     #passenger = (0.186-0.17)/(2030-2018) = 0.00133
     #suv = (0.26-0.24)/(2030-2018) = 0.00166
