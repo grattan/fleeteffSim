@@ -25,7 +25,8 @@ Imports:
     magrittr,
     ggplot2,
     grattantheme,
-    devtools
+    devtools,
+    markdown
 Depends: 
     R (>= 2.10)
 Suggests: 
