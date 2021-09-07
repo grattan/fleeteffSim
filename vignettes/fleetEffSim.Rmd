@@ -426,7 +426,8 @@ Of new vehicle sales in Australia, in a given year a proportion of vehicles are 
 
 The RACV estimates that approximately 20 % of new vheicles sold run on premium fuel (https://www.racv.com.au/royalauto/moving/news-information/premium-petrol-guzzling-cash.html) (as of 2019). In the *fleetEffSim* model, it is assumed (through the default arguments of the variables ` .in_premium_95` and `.in_premium_98`) that 15% of non-electric vehicles run on octane 95 fuel, and 5% run on octane-98 or other premium blend fuel. These proportions are held constant across BAU and target trajectories in all years, given the high uncertainty surrounding how emissions standards may effect these figures. 
 
-The proportion of vehicles assumed to run on diesel is determined based on data from: https://fleetautonews.com.au/new-car-sales-by-fuel-type-fleet-buyers, and is dependent on vehicle type. the arguments `.in_passenger_diesel`, `.in_suv_diesel` and `.in_lcv_diesel` specify the diesel proportions in each segment and can be changed by the user, however have the default arguments (as a proportion) of 0.02, 0.21 and 0.92 respectively. 
+The proportion of vehicles assumed to run on diesel is determined based on data from: https://fleetautonews.com.au/new-car-sales-by-fuel-type-fleet-buyers, and is dependent on vehicle type. 
+This data is not perfect - it only includes data from fleet sales, not all vehicle sales. However, this account fro ~50% of all vehicles, and there is the best data available for 2008 sales. The arguments `.in_passenger_diesel`, `.in_suv_diesel` and `.in_lcv_diesel` specify the diesel proportions in each segment and can be changed by the user, however have the default arguments (as a proportion) of 0.02, 0.21 and 0.92 respectively. 
 
 
 ### Future electricity prices

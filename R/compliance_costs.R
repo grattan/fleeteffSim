@@ -25,7 +25,7 @@
 
 
 globalVariables(c("fleet", "target", "cost_curves", "passenger",
-                  "targets_and_bau", "target_type"))
+                  "targets_and_bau", "target_type", "value"))
 
 
 
@@ -42,9 +42,13 @@ compliance_costs <- function(.fleet,
                              .run_to_year = 2050) {
 
 
-  #selecting the target required (or BAU)
+  #selecting the target required
   .target <- .target_file %>%
     filter(target_type == .target_scenario)
+
+  #also selecting the BAU
+  .bau <- .target_file %>%
+    filter(target_type == "bau")
 
 
   #in a given year starting at 2021 (we'll be looping through years)
@@ -80,9 +84,23 @@ compliance_costs <- function(.fleet,
     .this_year_fleet <- .fleet %>%
       filter(year == .year)
 
-    .this_year_target <- .target %>%
-      filter(year == .year)
 
+    #setting the target (or if the target is higher than the BAU, it defaults to the BAU alue
+
+    if(.target %>% filter(year == .year) %>% pull(value)
+       <=
+       .bau %>% filter(year == .year) %>% pull(value)) {
+
+         .this_year_target <- .target %>%
+           filter(year == .year)
+
+    } else {
+      .this_year_target <- .bau %>%
+        filter(year == .year)
+
+       }
+
+    #and selecting the cost curves
     .this_year_curves <- .cost_curves %>%
       filter(year == .year)
 
