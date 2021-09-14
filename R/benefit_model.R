@@ -311,8 +311,12 @@ benefit_model <- function(.fleet,
 
     #and we also want a column for total emissions for each car based on km driven in that year
     mutate(total_emissions = case_when(
-      #first for ice's (in grams: g/km * km)
-      electric_applied == FALSE ~ real_emissions * km_driven,
+      #first for ice's (in grams: g/km * km * 1.2)
+
+      #the 1.2 factor is used to include upstream emissions - that is, emissions that
+      #are produced in producing/refining/transporting the fuel to the petrol station
+      #this is based on information from : NEED TO FIND THE SOURCE AGAIN
+      electric_applied == FALSE ~ real_emissions * km_driven * 1.2,
       #now calculating the emissions for ev's - we x 1000 as emissions intensity is in g/Wh and we have
       #energy consumption in kWh
       electric_applied == TRUE ~ (emissions_intensity * energy_consumption * 1000 * km_driven))) %>%
