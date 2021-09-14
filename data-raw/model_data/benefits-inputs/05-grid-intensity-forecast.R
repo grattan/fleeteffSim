@@ -13,9 +13,10 @@ source("data-raw/model_data/00-setup.R")
 #We are going to assume the 'step change' AEMO scenario is used. This has also been linearly
 #interpolated to reach assumed net 0 by 2050 (calculations in spreadsheet)
 
-energy_intensity <- read_xlsx("data-raw/AEMO/emissions-intensity-grid.xlsx",
+energy_intensity <- read_xlsx("data-raw/external_data/AEMO/emissions-intensity-grid.xlsx",
                               sheet = "step_change") %>%
   clean_names() %>%
+  select(-old) %>%
   complete(year = (2051:2060)) %>%
   arrange(year) %>%
   na.locf()
