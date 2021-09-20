@@ -28,7 +28,6 @@ devtools::load_all()
 
 ```{r setup}
 library(ggplot2)
-library(grattantheme)
 library(magrittr)
 library(dplyr)
 ```
@@ -91,11 +90,11 @@ cost_curves %>%
   mutate(cumulative_cost = cumsum(incr_cost)) %>%
   ggplot(aes(x = cumulative_reduction, y = cumulative_cost)) +
   geom_point() +
-  scale_y_continuous_grattan(limits = c(0, 10000)) +
-  scale_x_continuous_grattan(limits = c(0, 100)) +
+  scale_y_continuous(limits = c(0, 10000)) +
+  scale_x_continuous(limits = c(0, 100)) +
   geom_smooth(se = FALSE,
               span = 0.7) +
-  theme_grattan(chart_type = "scatter") +
+  theme_minimal() +
   labs(title = "Passenger vehicles technology cost curve (2021)",
        subtitle = "Technology cost and efficiency improvements for passenger vehicles",
        x = "Cost $",
@@ -157,12 +156,11 @@ cost_curves %>%
   mutate(cumulative_cost = cumsum(incr_cost)) %>%
   ggplot(aes(x = cumulative_reduction, y = cumulative_cost, colour = vehicle_group)) +
   geom_point() +
-  scale_y_continuous_grattan(limits = c(0, 10000)) +
-  scale_x_continuous_grattan(limits = c(0, 100)) +
+  scale_y_continuous(limits = c(0, 10000)) +
+  scale_x_continuous(limits = c(0, 100)) +
+  theme_minimal() +
   geom_smooth(se = FALSE,
               span = 0.7) +
-  theme_grattan(chart_type = "scatter", legend = "bottom") +
-  grattan_colour_manual() +
   labs(title = "Technology cost curves (2021)",
        subtitle = "Technology cost and efficiency improvements for passenger vehicles",
        x = "Cost $",
@@ -345,7 +343,7 @@ targets_and_bau %>%
   filter(target_type == "bau") %>% 
   ggplot() +
   geom_line(aes(x = year, y = value)) +
-  theme_grattan() +
+  theme_minimal() +
   labs(title = "The assumed emissions trajectory under business as usual",
        subtitle = "Average emissions of new vehicle sales (CO2g/km) over time",
        x = "Year")
@@ -390,17 +388,15 @@ The resulting data is plotted below:
 km_travelled %>% 
   ggplot() +
   geom_line(aes(x = age, y = km_travelled, colour = vehicle_type)) +
-  scale_x_continuous_grattan(limits = c(0, 17)) +
-  theme_grattan(legend = "top") +
+  scale_x_continuous(limits = c(0, 17)) +
+  theme_minimal() +
   labs(title = "The assumed distance driven by vehicle type and age",
        subtitle = "Yearly km driven",
        x = "Vehicle age",
        y = "Yearly km driven",
-       caption = "Note that because distance is assumed equal for passenger and SVU types, the lines are on top of each other and therefore not both visible") +
-  grattan_colour_manual()
+       caption = "Note that because distance is assumed equal for passenger and SVU types, the lines are on top of each other and therefore not both visible") 
   
   
-
 ```
 
 

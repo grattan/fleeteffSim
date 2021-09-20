@@ -39,7 +39,8 @@ compliance_costs <- function(.fleet,
                              .suv_existing_tech = 26,
                              .passenger_existing_tech = 22,
                              .lcv_existing_tech = 18,
-                             .run_to_year = 2050) {
+                             .run_to_year = 2050,
+                             .penalty_begin = 2024) {
 
 
   #selecting the target required
@@ -52,7 +53,7 @@ compliance_costs <- function(.fleet,
 
 
   #in a given year starting at 2021 (we'll be looping through years)
-  .year <- 2021
+  .year <- .penalty_begin
   fleet_out <- tibble()
 
 

@@ -71,6 +71,7 @@ fleet_eff_sim <- function(#cost model inputs
                         .in_passenger_existing_tech = 22,
                         .in_lcv_existing_tech = 18,
                         .in_run_to_year = 2050,
+                        .in_penalty_begin = 2024,
 
                         #benefit model inputs
                         .fleet,
@@ -134,7 +135,8 @@ fleet_eff_sim <- function(#cost model inputs
                                         .suv_existing_tech = .in_suv_existing_tech,
                                         .passenger_existing_tech = .in_passenger_existing_tech,
                                         .lcv_existing_tech = .in_lcv_existing_tech,
-                                        .run_to_year = .in_run_to_year)
+                                        .run_to_year = .in_run_to_year,
+                                        .penalty_begin = .in_penalty_begin)
 
   #this gives the option of not re-running the bau for the cost scenario repeatedly if not required
 
@@ -148,7 +150,8 @@ fleet_eff_sim <- function(#cost model inputs
                                         .suv_existing_tech = .in_suv_existing_tech,
                                         .passenger_existing_tech = .in_passenger_existing_tech,
                                         .lcv_existing_tech = .in_lcv_existing_tech,
-                                        .run_to_year = .in_run_to_year)
+                                        .run_to_year = .in_run_to_year,
+                                        .penalty_begin = .in_penalty_begin)
 
   } else {
 
