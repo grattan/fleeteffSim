@@ -4,6 +4,8 @@
 # fleeteffSim
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/grattan/fleeteffSim/workflows/R-CMD-check/badge.svg)](https://github.com/grattan/fleeteffSim/actions)
 <!-- badges: end -->
 
 Things to be fixed:
@@ -25,16 +27,15 @@ Things to be fixed:
 
 ## Installation
 
-You can install the released version of fleeteffSim from
-[CRAN](https://CRAN.R-project.org) with:
+You can install the released version of `fleeteffSim` from [Github]()
+with:
 
 ``` r
-install.packages("fleeteffSim")
+# install.packages("remotes")
+remotes::install_github("grattan/fleeteffSim")
 ```
 
 ## Example
-
-This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(fleeteffSim)

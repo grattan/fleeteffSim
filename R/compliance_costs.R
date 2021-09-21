@@ -4,15 +4,19 @@
 #'
 #' @description Compliance costs
 #'
-#' @param .fleet The simulated fleet of new vehicle sales until 2050
-#' @param .target The target type selected from \code{targets_and_bau} for the compliance cost run. Options include
+#' @param .fleet The simulated fleet of new vehicle sales. No defaults. Set to \code{.fleet = fleet_crator()} for default fleet assumptions.
+#' @param .target_scenario The target type selected from \code{targets_and_bau} for the compliance cost run. Options include
 #' "target_central", "bau", "target_linear", "target_ambitious".
+#' @param .target_file The file containing the target scenarios. Should include three columns: `value` (the target emissions), `year`,
+#' and `target_type`
 #' @param .cost_curves The assumed cost curves for al vehicle types
 #' @param .cost_curve_estimate The cost curves estimate type
 #' @param .suv_existing_tech The assumed existing technology for SUVs
 #' @param .passenger_existing_tech The assumed existing technology for passenger vehicles
 #' @param .lcv_existing_tech The assumed existing technology for LCVs
 #' @param .run_to_year The year the function will run until
+#' @param .penalty_begin The assumed year that targets become binding. This is the start date for the model (inclusive);
+#' prior to the specified year, there is assumed to target benefits, regardless of the target values specified.
 #'
 #'
 #'

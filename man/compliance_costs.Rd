@@ -4,10 +4,13 @@
 \alias{compliance_costs}
 \title{Compliance costs}
 \arguments{
-\item{.fleet}{The simulated fleet of new vehicle sales until 2050}
+\item{.fleet}{The simulated fleet of new vehicle sales. No defaults. Set to \code{.fleet = fleet_crator()} for default fleet assumptions.}
 
-\item{.target}{The target type selected from \code{targets_and_bau} for the compliance cost run. Options include
+\item{.target_scenario}{The target type selected from \code{targets_and_bau} for the compliance cost run. Options include
 "target_central", "bau", "target_linear", "target_ambitious".}
+
+\item{.target_file}{The file containing the target scenarios. Should include three columns: `value` (the target emissions), `year`,
+and `target_type`}
 
 \item{.cost_curves}{The assumed cost curves for al vehicle types}
 
@@ -20,6 +23,9 @@
 \item{.lcv_existing_tech}{The assumed existing technology for LCVs}
 
 \item{.run_to_year}{The year the function will run until}
+
+\item{.penalty_begin}{The assumed year that targets become binding. This is the start date for the model (inclusive);
+prior to the specified year, there is assumed to target benefits, regardless of the target values specified.}
 }
 \value{
 A \code{tibble} with a 'compliant' vehicle fleet, where technology upgrades have been
