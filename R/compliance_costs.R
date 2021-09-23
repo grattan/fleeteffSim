@@ -56,7 +56,7 @@ compliance_costs <- function(.fleet,
     filter(target_type == "bau")
 
 
-  #in a given year starting at 2021 (we'll be looping through years)
+  #in a given year starting at what is set (we'll be looping through years)
   .year <- .penalty_begin
   fleet_out <- tibble()
 

@@ -17,10 +17,10 @@ discount <- function(data, rate) {
   i <- 1
   while (i <= nrow(data)) {
 
-    data$additional_cost[i] =  (data$additional_cost[i])  / ((1 + rate)^(i))
-    data$fuel_cost_savings[i] =  (data$fuel_cost_savings[i])  / ((1 + rate)^(i))
-    data$co2_value_20[i] =  (data$co2_value_20[i])  / ((1 + rate)^(i))
-    data$co2_value_35[i] =  (data$co2_value_35[i])  / ((1 + rate)^(i))
+    data$additional_cost[i] =  (data$additional_cost[i])  / ((1 + rate)^(data$year - 2021))
+    data$fuel_cost_savings[i] =  (data$fuel_cost_savings[i])  / ((1 + rate)^(data$year - 2021))
+    data$co2_value_20[i] =  (data$co2_value_20[i])  / ((1 + rate)^(data$year - 2021))
+    data$co2_value_35[i] =  (data$co2_value_35[i])  / ((1 + rate)^(data$year - 2021))
 
     i <- i + 1
   }
