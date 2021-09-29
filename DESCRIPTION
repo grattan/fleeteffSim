@@ -14,6 +14,8 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Config/testthat/edition: 3
+Depends: 
+    R (>= 3.10)
 Imports: 
     crayon,
     data.table,
@@ -21,15 +23,14 @@ Imports:
     dplyr,
     tidyr,
     readr,
-    testthat,
+    purrr,
     magrittr,
-    ggplot2,
-    grattantheme,
-    devtools
-Depends: 
-    R (>= 2.10)
 Suggests: 
     rmarkdown,
     knitr,
-    markdown
+    markdown,
+    grattantheme,
+    ggplot2,
+    devtools,
+    testthat
 VignetteBuilder: knitr

@@ -6,13 +6,13 @@
 \arguments{
 \item{.fleet}{The simulated fleet of new vehicle sales. No defaults. Set to \code{.fleet = fleet_crator()} for default fleet assumptions.}
 
+\item{.target_file}{The file containing the target scenarios. Should include three columns: `value` (the target emissions), `year`,
+and `target_type`.}
+
 \item{.target_scenario}{The target type selected from \code{targets_and_bau} for the compliance cost run. Options include
 "target_central", "bau", "target_linear", "target_ambitious".}
 
-\item{.target_file}{The file containing the target scenarios. Should include three columns: `value` (the target emissions), `year`,
-and `target_type`}
-
-\item{.cost_curves}{The assumed cost curves for al vehicle types}
+\item{.cost_curves}{The assumed cost curves for all vehicle types.}
 
 \item{.cost_curve_estimate}{The cost curves estimate type}
 

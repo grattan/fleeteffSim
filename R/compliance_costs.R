@@ -5,11 +5,11 @@
 #' @description Compliance costs
 #'
 #' @param .fleet The simulated fleet of new vehicle sales. No defaults. Set to \code{.fleet = fleet_crator()} for default fleet assumptions.
+#' @param .target_file The file containing the target scenarios. Should include three columns: `value` (the target emissions), `year`,
+#' and `target_type`.
 #' @param .target_scenario The target type selected from \code{targets_and_bau} for the compliance cost run. Options include
 #' "target_central", "bau", "target_linear", "target_ambitious".
-#' @param .target_file The file containing the target scenarios. Should include three columns: `value` (the target emissions), `year`,
-#' and `target_type`
-#' @param .cost_curves The assumed cost curves for al vehicle types
+#' @param .cost_curves The assumed cost curves for all vehicle types.
 #' @param .cost_curve_estimate The cost curves estimate type
 #' @param .suv_existing_tech The assumed existing technology for SUVs
 #' @param .passenger_existing_tech The assumed existing technology for passenger vehicles
@@ -26,16 +26,11 @@
 #' @export
 #'
 #'
-
-
 globalVariables(c("fleet", "target", "cost_curves", "passenger",
-                  "targets_and_bau", "target_type", "value"))
+                  "targets_and_bau", "target_type", "value", "is_upgrade"))
 
 
-
-
-
-compliance_costs <- function(.fleet,
+compliance_costs <- function(.fleet = fleet_creator(),
                              .target_file = targets_and_bau,
                              .target_scenario,
                              .cost_curves = cost_curves,
@@ -65,108 +60,66 @@ compliance_costs <- function(.fleet,
   #we're going to apply the existing technology to the cost curve using the function
   #add_existing_tech in that script
 
-  .cost_curves <- bind_rows(add_existing_technology(.type = "suv",
-                                                    .existing_tech = .suv_existing_tech,
-                                                    .estimate = .cost_curve_estimate,
-                                                    .cost_curves = .cost_curves),
-                            add_existing_technology(.type = "passenger",
-                                                    .existing_tech = .passenger_existing_tech,
-                                                    .estimate = .cost_curve_estimate,
-                                                    .cost_curves = .cost_curves),
-                            add_existing_technology(.type = "lcv",
-                                                    .existing_tech = .lcv_existing_tech,
-                                                    .estimate = .cost_curve_estimate,
-                                                    .cost_curves = .cost_curves)) %>%
+  .cost_curve_inputs <- tibble(type = c("suv", "passenger", "lcv"),
+                               existing_tech = c(.suv_existing_tech,
+                                                 .passenger_existing_tech,
+                                                 .lcv_existing_tech)
+                               )
+
+  .cost_curves <- purrr::map2_dfr(
+      .x = .cost_curve_inputs$type,
+      .y = .cost_curve_inputs$existing_tech,
+      .f = add_existing_technology,
+      .estimate = .cost_curve_estimate,
+      .cost_curves = .cost_curves) %>%
     filter(estimate == .cost_curve_estimate)
 
 
-
-  #THE YEAR LOOP
-  #--------------------------------
-  while (.year <= .run_to_year) {
+  # THE YEAR LOOP --------------------------------------------------------------
+  for (.year in .penalty_begin:.run_to_year) {
 
     #setting the parameters based on the year
     .this_year_fleet <- .fleet %>%
       filter(year == .year)
 
-
-    #setting the target (or if the target is higher than the BAU, it defaults to the BAU alue
-
-    if(.target %>% filter(year == .year) %>% pull(value)
-       <=
-       .bau %>% filter(year == .year) %>% pull(value)) {
-
-         .this_year_target <- .target %>%
-           filter(year == .year)
-
-    } else {
-      .this_year_target <- .bau %>%
-        filter(year == .year)
-
-       }
+    #setting the target (or if the target is higher than the BAU, it defaults to the BAU value
+    .this_year_target <- pmin(.target$value[.target$year == .year],
+                              .bau$value[.bau$year == .year])
 
     #and selecting the cost curves
     .this_year_curves <- .cost_curves %>%
       filter(year == .year)
 
 
-    #now we'll be looping through the individual vehicle in the fleet
-    # THE APPLICATION LOOP (applying the best tech over and over 9selected by the selection loop)
-    #----------------------------
+    # APPLICATION LOOP ---------------------------------------------------------
+    # now we'll be looping through the individual vehicle in the fleet, applying
+    # the best tech over and over, selected by the selection loop)
+
     .target_reached = FALSE
 
     while (.target_reached == FALSE) {
-
-      #this function does the first thing we want - it selects the next best upgrade to apply
-      #tic()
-
+      # select the next best upgrade to apply
+      tic("select_upgrade")
       .upgrade <- select_upgrade(.this_year_fleet, .this_year_curves)
-      #toc()
+      toc()
 
-      #now we've got our upgrade, we want to apply it to the relevant car
-      #we do this below
+      tic("update row")
+      .updated_row <- .upgrade %>%
+        left_join(.this_year_fleet, by = "id") %>%
+        mutate(current_emissions = current_emissions * (1 - incr_reduction),
+               cost = cost + incr_cost,
+               tech_pkg_applied = tech_pkg_no,
+               electric_applied = type == "ev") %>%
+        select(year, vehicle_group, id, base_emissions, current_emissions, electric_applied, tech_pkg_applied, cost)
 
-      #PRINTING TO DEBUG
-      #print("This year fleet")
-      #print(.this_year_fleet)
-
-      #tic()
-
-
-      .this_year_fleet <- .this_year_fleet %>%
-        mutate(
-          #updating the current emissions of the car
-          current_emissions = case_when(
-            id == .upgrade$id ~ (current_emissions - (current_emissions * .upgrade$incr_reduction)),
-            id != .upgrade$id ~ current_emissions),
-
-          #updating the cost
-          cost = case_when(
-            id == .upgrade$id ~ (cost + .upgrade$incr_cost),
-            id != .upgrade$id ~ cost),
-
-          #updating the tech package number
-          tech_pkg_applied = case_when(
-            id == .upgrade$id ~ (.upgrade$tech_pkg_no),
-            id != .upgrade$id ~ tech_pkg_applied),
-
-          #and whether it has gone electric or not
-          electric_applied = case_when(
-            id == .upgrade$id ~ (.upgrade$type == "ev"),
-            id != .upgrade$id ~ electric_applied)
-        )
-
-      #toc()
-
-      #message(bold$blue(.year, " emissions at ", round(mean(.this_year_fleet$current_emissions), digits = 2)))
-
-      #message(bold$cyan("Cost at ", round(mean(.this_year_fleet$cost), digits = 2)))
-
+      # update table
+      .this_year_fleet <- rows_update(.this_year_fleet, .updated_row, by = "id")
+      toc()
 
       #checking if we've reached the target (if not the loop continues running)
-      .target_reached <- (mean(.this_year_fleet$current_emissions) <= .this_year_target$value)
+      .target_reached <- mean(.this_year_fleet$current_emissions) <= .this_year_target
 
-    }
+    } # end application loop
 
     message(bold$green("Target reached for year ", .year))
     message(blue$bold(.year, "average emission value is ", round(mean(.this_year_fleet$current_emissions), digits = 2)))
@@ -177,7 +130,7 @@ compliance_costs <- function(.fleet,
 
     fleet_out <- bind_rows(fleet_out, .this_year_fleet)
 
-  }
+  } # end year loop
 
   return(fleet_out)
 

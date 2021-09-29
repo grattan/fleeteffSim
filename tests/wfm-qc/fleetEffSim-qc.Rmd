@@ -1,0 +1,173 @@
+---
+title: "fleetEffSim-qc"
+author: "Lachlan Fox"
+date: "28/09/2021"
+output: html_document
+---
+
+```{r setup2, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# FleetEffSim
+
+First the setup - probably don't need all these packages but they're my defaults. 
+
+```{r setup, message=FALSE, warning=FALSE}
+library(readxl)
+library(tidyverse)
+library(lubridate)
+library(scales)
+library(janitor)
+library(grattantheme)
+library(readxl)
+library(data.table)
+library(devtools)
+
+load_all()
+
+```
+
+
+A typical model run will usually be done by running four functions:
+
+ - `fleet_creator()`
+ - `compliance_costs()`
+ - `benefit_model()`
+ - `generate_results()`
+
+The first function adds technology to vehicles, reducing their emissions for a given cost to meet the targets. 
+
+```{r compliance, echo=FALSE}
+
+
+fleet <- fleet_creator()
+
+
+#first we calculate the technology costs of meeting our target scenario
+target_compliance <- compliance_costs(.fleet = fleet, 
+                                      .target_scenario = "target_central",
+                                      #these next two arguments are basically just saying start
+                                      #in 2024 and end in 2025 (only doing one year to demonstrate the point)
+                                      .penalty_begin = 2024,
+                                      .run_to_year = 2025) 
+
+#and then we do the same for our BAU scenario
+bau_compliance <- compliance_costs(.fleet = fleet_creator(), #the fleet_creator() function produces or simulated fleet
+                                      .target_scenario = "bau",
+                                      #these next two arguments are basically jsut saying start
+                                      #in 2024 and end in 2025 (only doing one year to demonstrate the point)
+                                      .penalty_begin = 2024,
+                                      .run_to_year = 2025) 
+
+
+```
+
+
+
+The second function takes the output of the compliance_costs function to estimate the running costs, petrol use, emissions etc. of the vehicles. 
+
+
+```{r benefit, echo=FALSE}
+
+
+#first we calculate the technology costs of meeting our target scenario
+target_benefit <- benefit_model(.fleet = target_compliance)
+
+#and then we do the same for our BAU scenario
+bau_benefit <- benefit_model(.fleet = bau_compliance)
+
+```
+
+The output of the benefit_model function is used for anything where we want more granular data on the output, as it contains each vehicles emissions/running costs etc. It also includes dead cars (i.e. post 17 years old with 0 km in each year), so need to be careful to exclude them if using this data. 
+
+
+
+A potential output from this scenario could, for example, be a bar chart comparing the emissions under the bau and target scenarios. I.e.
+
+```{r emissions-plot, echo=FALSE}
+
+emissions <- bind_rows(
+  
+    target_benefit %>% 
+      mutate(scenario = "central target"),
+    
+    bau_benefit %>% 
+      mutate(scenario = "bau")) %>% 
+  
+    filter(km_driven > 0) %>% 
+    group_by(scenario) %>% 
+    summarise(total_emissions = sum(total_emissions))
+
+#jsut as an example, we might compare the emissions between these scenarios (although these numbers
+#are a bit whacky because we limited the model run to one year)
+#we would probably add more scenarios comparing mutliple targets, as we do in the report 
+#(for reference, page 18)
+emissions %>% 
+  ggplot(aes(x = total_emissions,
+             y = scenario,
+             fill = scenario)) +
+  geom_col() +
+  theme_grattan() +
+  grattan_fill_manual(2) +
+  labs(title = "X amount of emissions is saved under a target scenario",
+       subtitle = "Total lifetime emissions (tons CO2) from vehicles sold in XX period")
+
+```
+
+
+Comparatively, for a high level overview of the results that is summarised, we use the generate_results() function.
+This compares between the target and bau scenarios to get the additional costs/benefits of the policy. 
+
+
+```{r results, echo=FALSE}
+
+results <- generate_results(bau_benefits = bau_benefit,
+                            target_benefits = target_benefit,
+                            #this cars argument just specifies the number of cars in the simulated fleet. The one produced by fleet_creator() defaults to 100, so that's what we use
+                            cars = 100)
+
+```
+
+
+This output would often be used either to determine a figure for the cost of abatement (i.e. so we can say in the text, this policy has a benefit fo \$35 per tonne of carbon abated) or to compare multiple different target scenarios or sensitivity runs. Hard to demonstrate with only one model runs, but I've invited you to the overleaf document, where page 20 (fig 3.4) demonstrates this. 
+
+The other result of this is to break up the components of the results, for eg:
+
+```{r results plot, echo=FALSE}
+
+results %>% 
+  filter(co2_value == 20, 
+         scenario == "discount_7_perc") %>% 
+  select(scenario, npv, additional_cost, fuel_cost_savings) %>% 
+  mutate(additional_cost = -additional_cost) %>% 
+  pivot_longer(cols = (2:4),
+               names_to = "cost",
+               values_to = "value") %>% 
+  ggplot() +
+  geom_col(aes(y = value, 
+               x = cost,
+               fill = cost)) +
+    theme_grattan() +
+   scale_y_continuous_grattan() +
+    grattan_fill_manual(3) +
+  labs(title = "Under an emissions target, consumers save money in the long run",
+       subtitle = "Upfront and running costs of an emissions standards")
+  
+
+```
+
+
+These three steps are all summarised into one function for more general use - fleet_eff_sim(). It does the exact same thing as the above process but only gives out the summary data. Don't tend to use it lots because it doesn't let me see the results of each step, but might be helpful for someone else running the model, and good for quick tests of individual scenarios. 
+
+```{r all-model, echo=FALSE}
+
+results_2 <- fleet_eff_sim(.in_penalty_begin = 2024, 
+                           .in_run_to_year = 2025,
+                           .in_target_scenario = "target_central",
+                           .in_bau_scenario = "bau")
+
+```
+
+
+

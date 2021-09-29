@@ -25,10 +25,10 @@ add_existing_technology <- function(.type,
   .cost_curves <- .cost_curves %>%
     filter(vehicle_group == .type,
            estimate == .estimate) %>%
-    mutate(existing_tech = case_when(
-      .existing_tech >= cumulative_reduction ~ "existing",
-      .existing_tech < cumulative_reduction ~ "not existing"
-    ))
+    mutate(existing_tech = fifelse(.existing_tech >= cumulative_reduction,
+                                   "existing",
+                                   "not existing")
+           )
 
   .existing_tech_no <- .cost_curves %>%
     filter(existing_tech == "existing") %>%
@@ -67,8 +67,9 @@ add_existing_technology <- function(.type,
   #and now we have our three parts - the zeroed existing tech, altered next tech and
   #remaining tech, we can combine them all
 
-  .cost_curves <- bind_rows(.zeroed_existing_tech, .next_tech)
-  .cost_curves <- bind_rows(.cost_curves, .remaining_packages)
+  .cost_curves <- .zeroed_existing_tech %>%
+    bind_rows(.next_tech) %>%
+    bind_rows(.remaining_packages)
 
 
   return(.cost_curves)
