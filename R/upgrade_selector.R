@@ -98,6 +98,7 @@ select_upgrade <- function(.this_year_fleet,
           !is.nan(dollar_per_gram_reduced) , dollar_per_gram_reduced,
           #we are putting in an arbitrary 1% of one cent here so it's non zero
           is.nan(dollar_per_gram_reduced) , 0.00001 )) %>%
+        #arrange(id) %>%
         slice_min(dollar_per_gram_reduced, n = 1, with_ties = FALSE) %>%
         mutate(id = .id)
 

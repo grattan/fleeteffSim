@@ -5,20 +5,20 @@
 #' @description Benefit model
 #'
 #' @param .fleet The output of 'compliance_cost' function, with a compliant simulated fleet
-#' @param .km_travelled The assumed km travelled for each vehicle segment and vehicle age
-#' @param .fuel_prices Assumed future fuel prices (excluding taxes)
-#' @param .electricity_prices Assumed future electricity prices
-#' @param .energy_consumption Assumed energy consumption of electric vehicles
-#' @param .energy_intensity Assumed energy intensity of the electricity grid
-#' @param .gap The assumed 'gap' between test cycle and real world emissions for combustion vehicles
-#' @param .fuel_scenario The assumed fuel price scenario
-#' @param .electricity_scenario Assumed electricity price scenario
-#' @param .run_to_year Year the model will run to
-#' @param .passenger_diesel Proportion of disel passenger vehicles
-#' @param .suv_diesel Proportion of suv diesel vehicles
-#' @param .lcv_diesel Proportion of LCV diesel vehicles
-#' @param .premium_95 Proportion of vehicles requiring 95oct fuel
-#' @param .premium_98 Proportion of vehicles requiring 98oct fuel
+#' @param .km_travelled Defaults to \code{km_travelled}. The assumed distance travelled by each vehicle per year, depending on vehicle age and type.
+#' @param .fuel_prices Defaults to \code{fuel_prices}. The assumed future price of fuel.
+#' @param .electricity_prices Defaults to \code{electricity_prices}. the assumed future price of electricity.
+#' @param .energy_consumption Defaults to \code{energy_consumption}. The assumed future energy consumption of electric vehicles, in kWh/km travelled.
+#' @param .energy_intensity Defaults to \code{energy_intensity}. The assumed future energy intensity of the electricity grid, in gCO2 equivalent per wH.
+#' @param .gap Defaults to 1.2. The assumed gap between tested and real world emissions. 1.2 is equivalent to 20\%
+#' @param .fuel_scenario Defaults to "central". The assumed fuel price scenario from the \code{.in_fuel_prices} \code{tibble}
+#' @param .electricity_scenario Defaults to "central". The assumed electricity price scenario from the \code{.in_electricity_prices} \code{tibble}
+#' @param .run_to_year Defaults to 2060. The year to which the benefit model will run. Given an assumed vehicle lifetime of 17 years, to account for full vehicle lifetime costs/benefits/emissions, this should be set to over 17 years after the last running year in \code{compliance_costs()}
+#' @param .passenger_diesel faults to  0.02. The assumed proportion of passenger vehicles requiring diesel fuel.
+#' @param .suv_diesel Defaults to 0.21. The assumed proportion of SUV vehicles requiring diesel fuel.
+#' @param .lcv_diesel  Defaults to 0.92. The assumed proportion of LCV vehicles requiring diesel fuel.
+#' @param .premium_95 Defaults to 0.15. The assumed proportion of ICE vehicles requiring premium 95ron petrol.
+#' @param .premium_98 Defaults to 0.05. The assumed proportion of ICE vehicles requiring premium 98ron petrol.
 #'
 #' @return A \code{tibble} including the fuel, emissions, costs for each vehicle in the simulated fleet
 #' over it' lifespan
@@ -279,7 +279,7 @@ benefit_model <- function(.fleet,
       electric_applied == TRUE ~ energy_consumption * 100 * energy_price,
       (electric_applied == FALSE)  ~ price_91 * petrol_co2_to_fuel(current_emissions * .gap))) %>%
 
-    #using the difference in runing costs to update km travelled with an elasticity of 0.1
+    #using the difference in running costs to update km travelled with an elasticity of 0.1
     #this assumes a 1% running cost decrease increases driving distance by 0.1%
     rowwise() %>%
     mutate(rebound_factor = ((1 - (current_cost_100km / base_cost_100km)) * 10) + 100,

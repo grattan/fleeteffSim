@@ -65,12 +65,12 @@ compliance_costs <- function(.fleet,
   #we're going to apply the existing technology to the cost curve using the function
   #add_existing_tech in that script
 
-  .cost_curves <- bind_rows(add_existing_technology(.type = "suv",
-                                                    .existing_tech = .suv_existing_tech,
+  .cost_curves <- bind_rows(add_existing_technology(.type = "passenger",
+                                                    .existing_tech = .passenger_existing_tech,
                                                     .estimate = .cost_curve_estimate,
                                                     .cost_curves = .cost_curves),
-                            add_existing_technology(.type = "passenger",
-                                                    .existing_tech = .passenger_existing_tech,
+                            add_existing_technology(.type = "suv",
+                                                    .existing_tech = .suv_existing_tech,
                                                     .estimate = .cost_curve_estimate,
                                                     .cost_curves = .cost_curves),
                             add_existing_technology(.type = "lcv",
