@@ -10,6 +10,7 @@
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr complete
 #' @importFrom tidyr replace_na
+#' @importFrom tidyr crossing
 #' @importFrom purrr map2_dfr
 
 

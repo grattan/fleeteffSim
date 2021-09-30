@@ -37,7 +37,16 @@ fleet_creator <- function(.i_cars = 100,
                           .lcv_co2 = 215) {
 
   # checks
-  if (.i_passenger_share + .i_suv_share + .i_lcv_share != 1) stop("shares must sum to 1")
+  if (round(.i_passenger_share + .i_suv_share + .i_lcv_share, 2) != 1) {
+    stop("shares must sum to 1. Currently:",
+         "\n\t.i_passenger_share = ", .i_passenger_share,
+         "\n\t.i_suv_share = ", .i_suv_share,
+         "\n\t.i_lcv_share = ", .i_lcv_share,
+         "\n\tTotal: ", .i_passenger_share + .i_suv_share + .i_lcv_share
+         )
+  }
+
+  if (any(.passenger_growth > 1.5, .suv_growth > 1.5, .lcv_growth > 1.5)) stop("annual growth (_growth) inputs must be 1.5 (50%) or less.")
 
   start_year <- 2021
   end_year <- 2050
@@ -52,14 +61,16 @@ fleet_creator <- function(.i_cars = 100,
     uncount(count) %>%
     group_by(year) %>%
     mutate(id = row_number(),
-           base_emissions = case_when(
-             vehicle_group == "passenger" ~ .passenger_co2,
-             vehicle_group == "suv" ~ .suv_co2,
-             vehicle_group == "lcv" ~ .lcv_co2),
+           base_emissions = fcase(
+             vehicle_group == "passenger", .passenger_co2,
+             vehicle_group == "suv", .suv_co2,
+             vehicle_group == "lcv", .lcv_co2),
            current_emissions = base_emissions,
            electric_applied = FALSE,
            tech_pkg_applied = 0,
-           cost = 0)
+           cost = 0) %>%
+    arrange(vehicle_group, id) %>%
+    ungroup()
 
   return(fleet_out)
 

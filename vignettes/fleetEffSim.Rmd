@@ -16,12 +16,10 @@ knitr::opts_chunk$set(
 ```
 
 ```{r, eval=TRUE, include=FALSE}
-
 devtools::load_all()
 ```
 
 ``` {r, eval=FALSE, include=TRUE}
-
 #library(fleetEffSim)
 ```
 
@@ -430,7 +428,7 @@ To account for these factors in the model, the ABS data was used to plot a linea
 
 The resulting data is plotted below:
 
-``` {r, echo = FALSE}
+```{r, echo = FALSE}
 km_travelled %>% 
   ggplot() +
   geom_line(aes(x = age, y = km_travelled, colour = vehicle_type)) +

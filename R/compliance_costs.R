@@ -42,27 +42,20 @@ compliance_costs <- function(.fleet = fleet_creator(),
                              .penalty_begin = 2024) {
 
 
-  #selecting the target required
+  # Starting conditions
   .target <- .target_file %>%
     filter(target_type == .target_scenario)
 
-  #also selecting the BAU
   .bau <- .target_file %>%
     filter(target_type == "bau")
 
-
-  #in a given year starting at what is set (we'll be looping through years)
   .year <- .penalty_begin
-  fleet_out <- tibble()
-
-
 
   #we're going to apply the existing technology to the cost curve using the function
-  #add_existing_tech in that script
-
-  .cost_curve_inputs <- tibble(type = c("suv", "passenger", "lcv"),
-                               existing_tech = c(.suv_existing_tech,
-                                                 .passenger_existing_tech,
+  # add_existing_tech in that script
+  .cost_curve_inputs <- tibble(type = c("passenger", "suv", "lcv"),
+                               existing_tech = c(.passenger_existing_tech,
+                                                 .suv_existing_tech,
                                                  .lcv_existing_tech)
                                )
 
@@ -76,11 +69,17 @@ compliance_costs <- function(.fleet = fleet_creator(),
 
 
   # THE YEAR LOOP --------------------------------------------------------------
+  is_zero <- FALSE
+  fleet_out <- tibble()
+
   for (.year in .penalty_begin:.run_to_year) {
+
+    message(green$bold("\nProcessing ", .year))
 
     #setting the parameters based on the year
     .this_year_fleet <- .fleet %>%
-      filter(year == .year)
+      filter(year == .year) %>%
+      select(-year)
 
     #setting the target (or if the target is higher than the BAU, it defaults to the BAU value
     .this_year_target <- pmin(.target$value[.target$year == .year],
@@ -88,7 +87,8 @@ compliance_costs <- function(.fleet = fleet_creator(),
 
     #and selecting the cost curves
     .this_year_curves <- .cost_curves %>%
-      filter(year == .year)
+      filter(year == .year) %>%
+      select(-base_emissions, -year)
 
 
     # APPLICATION LOOP ---------------------------------------------------------
@@ -99,41 +99,51 @@ compliance_costs <- function(.fleet = fleet_creator(),
 
     while (.target_reached == FALSE) {
       # select the next best upgrade to apply
-      tic("select_upgrade")
       .upgrade <- select_upgrade(.this_year_fleet, .this_year_curves)
-      toc()
 
-      tic("update row")
       .updated_row <- .upgrade %>%
         left_join(.this_year_fleet, by = "id") %>%
         mutate(current_emissions = current_emissions * (1 - incr_reduction),
                cost = cost + incr_cost,
                tech_pkg_applied = tech_pkg_no,
                electric_applied = type == "ev") %>%
-        select(year, vehicle_group, id, base_emissions, current_emissions, electric_applied, tech_pkg_applied, cost)
+        select(vehicle_group, id, base_emissions, current_emissions, electric_applied, tech_pkg_applied, cost)
 
       # update table
       .this_year_fleet <- rows_update(.this_year_fleet, .updated_row, by = "id")
-      toc()
 
       #checking if we've reached the target (if not the loop continues running)
       .target_reached <- mean(.this_year_fleet$current_emissions) <= .this_year_target
 
     } # end application loop
 
-    message(bold$green("Target reached for year ", .year))
-    message(blue$bold(.year, "average emission value is ", round(mean(.this_year_fleet$current_emissions), digits = 2)))
-    message(blue$bold("The average cost increase per vehicle was $", round(mean(.this_year_fleet$cost), digits = 2)))
-    message(cyan$bold("Moving to next year"))
+    mean_emissions <- mean(.this_year_fleet$current_emissions)
+    message(green("\tTarget reached for year ", .year))
+    message(blue("\tAverage emission value is ", round(mean_emissions, digits = 2)))
+    message(blue("\tAverage cost increase per vehicle was $", round(mean(.this_year_fleet$cost), digits = 2)))
 
-    .year <- .year + 1
+    # Save annual emissions (and apply to the rest if emissions are zero)
+    if (mean_emissions > 0) {
+      fleet_out <- bind_rows(fleet_out, .this_year_fleet %>%
+                                          mutate(year = .year))
+      message(cyan$bold("\tMoving to next year"))
+    } else {
+      message(red$bold("\tZero emissions achieved"))
+      message(red("\tSetting remaining years identical to", .year))
+      is_zero <- TRUE
+      # fill out remaining years as the same as this year
+      .this_year_fleet <- crossing(year = .year:.run_to_year,
+                                   .this_year_fleet)
 
-    fleet_out <- bind_rows(fleet_out, .this_year_fleet)
+      fleet_out <- bind_rows(fleet_out, .this_year_fleet)
 
-  } # end year loop
+      purrr::walk((.year + 1):.run_to_year, ~ message(green$bold("Processed ", .x)))
+
+      break
+    }
+
+  } # end year
 
   return(fleet_out)
 
 }
-
-

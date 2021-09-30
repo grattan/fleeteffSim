@@ -21,10 +21,6 @@ globalVariables(c("tech_pkg_applied", "id", "scenario", "vehicle_group",
 select_upgrade <- function(.this_year_fleet,
                            .this_year_curves) {
 
-  .tech_options <- tibble()
-  # just setting this so it gets overwritten very easily by the first cost
-  .best_incr_cost <- Inf
-
   # filtering down the fleet to the cars we know will probably take the upgrade -
   # there's no point checking against all cars when we know some of them will be higher cost
 
@@ -33,14 +29,16 @@ select_upgrade <- function(.this_year_fleet,
   # to have tech applied. If vehicle base emissions in each group != each other, this may not hold
   .cars_for_upgrade <- .this_year_fleet %>%
     group_by(vehicle_group) %>%
-    slice_min(tech_pkg_applied) %>%
-    slice_min(id) %>%
-    filter(!electric_applied)
+    arrange(tech_pkg_applied, id) %>%
+    slice(1) %>%
+    filter(!electric_applied) %>%
+    ungroup()
+
+   if (nrow(.cars_for_upgrade) == 0) message("No cars to upgrade!")
 
   # select vehicle with lowest cost per abatement
   .tech_options <- .this_year_curves %>%
-    select(-any_of("base_emissions")) %>%
-    left_join(.cars_for_upgrade, by = c("vehicle_group", "year")) %>%
+    inner_join(.cars_for_upgrade, by = c("vehicle_group")) %>%
     ungroup() %>%
     # filter the cost curves to only select available technologies
     filter(tech_pkg_no == tech_pkg_applied + 1 |  tech_pkg_no == 100) %>%
