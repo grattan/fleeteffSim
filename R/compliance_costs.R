@@ -69,7 +69,6 @@ compliance_costs <- function(.fleet = fleet_creator(),
 
 
   # THE YEAR LOOP --------------------------------------------------------------
-  is_zero <- FALSE
   fleet_out <- tibble()
 
   for (.year in .penalty_begin:.run_to_year) {
@@ -118,19 +117,19 @@ compliance_costs <- function(.fleet = fleet_creator(),
     } # end application loop
 
     mean_emissions <- mean(.this_year_fleet$current_emissions)
+    mean_costs <- mean(.this_year_fleet$cost)
     message(green("\tTarget reached for year ", .year))
     message(blue("\tAverage emission value is ", round(mean_emissions, digits = 2)))
-    message(blue("\tAverage cost increase per vehicle was $", round(mean(.this_year_fleet$cost), digits = 2)))
+    message(blue("\tAverage cost increase per vehicle was $", round(mean_costs, digits = 2)))
 
     # Save annual emissions (and apply to the rest if emissions are zero)
-    if (mean_emissions > 0) {
+    if (mean_emissions > 0 & mean_costs > 0) {
       fleet_out <- bind_rows(fleet_out, .this_year_fleet %>%
                                           mutate(year = .year))
       message(cyan$bold("\tMoving to next year"))
     } else {
       message(red$bold("\tZero emissions achieved"))
       message(red("\tSetting remaining years identical to", .year))
-      is_zero <- TRUE
       # fill out remaining years as the same as this year
       .this_year_fleet <- crossing(year = .year:.run_to_year,
                                    .this_year_fleet)

@@ -24,6 +24,8 @@ plus_minus_one <- function(x, y) {
   between(y, x - 1, x + 1)
 }
 
+# Run tests --------------------------------------------------------------------
+
 test_that("Fleet creation is as expected", {
 
   expect_identical(new_default_fleet,

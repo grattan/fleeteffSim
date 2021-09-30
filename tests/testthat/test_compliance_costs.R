@@ -26,7 +26,7 @@ test_that("Compliance cost outputs have not changed", {
   expect_identical(comp_default,
                    readr::read_rds("data/compliance-default-original.rds"))
 
-                 })
+})
 
 
 test_that("Targets are met", {
