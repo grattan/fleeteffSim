@@ -106,19 +106,56 @@ bau_all <- inner_join(uptake_curves, bau_ice) %>%
          "target_type" = scenario)
 
 
+
+#Creating a non-saturated BAU curve --------------------------------------------
+
+#Based on feedback from external reviewers, we're also going to create a non-saturated BAU
+#curve that assumes that EV's do not reach 100% sales before 2050. The curve is also slower in
+#emissions reductions over the mid 2030s period
+
+#To do this, we're first going to use the same data from the original BAU scenario up to 2030.
+
+bau_slow_1 <- bau_all %>%
+  filter(year <= 2030) %>%
+  mutate(target_type = "bau_slow")
+
+#This gets the emissions to ~120/km in 2030.
+#beyond this point, we're going to assume the rate follows to an annual improvement of
+# 8\% per year to 2050. This assumption leads to a 2050 emissions value of ~22-23g/km
+
+bau_slow_start <- bau_slow_1 %>%
+  filter(year == 2030) %>%
+  pull(value)
+
+bau_slow_2 <- bau_ice_estimator(.emissions_start = bau_slow_start,
+                  .years = tibble(year = c(2030:2050)),
+                  .rate = 0.08) %>%
+  select(-id) %>%
+  rename("value" = emissions) %>%
+  mutate(target_type = "bau_slow")
+
+bau_slow <- bind_rows(bau_slow_1, bau_slow_2)
+
+#and adding this to the bau all dataset
+
+bau_all <- bind_rows(bau_all,
+                     bau_slow)
+
 #Plotting  ----------------------------------------------------------------------
 bau_all %>%
-  ggplot(aes(x = year, y = total_emissions, colour = scenario)) +
+  ggplot(aes(x = year, y = value, colour = target_type)) +
   #geom_point() +
   scale_y_continuous_grattan(limits = c(0,200)) +
   theme_grattan(legend = "top") +
   grattan_colour_manual() +
-  geom_smooth(aes(colour = scenario), span = 0.2, se = FALSE) +
-  labs(title = "In our BAU scenario, new vehicles are zero emissions by 2048",
+  geom_smooth(aes(colour = target_type), span = 0.2, se = FALSE) +
+  labs(title = "In both tested BAU scenario, vehicle emissions fall rapidly to 2035",
        subtitle = "Average emissions (g/km) of new vehicle sales",
-       caption = "'Slow' assumed arena no intervention scenario, 1.5% ICE imprvoement/year.
-       'Fast' assumed ARENA's 'moderate intervention' EV scenario and 3% ICE improvement/year")
-grattan_save_all("atlas/bau.pdf")
+       caption = "BAU scenario assumes an ICE emissions improvement of 1.5% per year, and
+       an electric vehicle uptake following the ARENA no-intervention scenario. The BAU-slow scenario
+       assumes the same parameters as the BAU scenario until 2030. Beyond 2030, it assumes
+       emissions improve at a rate of 8% annually. ")
+#grattan_save_all("atlas/bau.pdf")
 
 
 
