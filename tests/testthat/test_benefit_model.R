@@ -42,34 +42,49 @@ premium_98 <- 0.05
 
   #fuel_type_proportion <- function(data = benefit, vehicle) {
 
-  #  fuel_proportions <- benefit %>%
-  #    filter(vehicle_group == "passenger",
-  #           fuel_type != "electric",
-  #           vehicle_age == 0) %>%
-  #    mutate(count = 1) %>%
-  #    group_by(fuel_type) %>%
-  #    summarise(proportion = sum(count)) %>%
-  #    ungroup() %>%
-  #    mutate(proportion = proportion / sum(proportion))
+is_plus_minus <- function(object, target, pm_level = 0.05) {
+  dplyr::between(object, target * (1 - pm_level), target * (1 + pm_level))
+}
+
+data %>%
+  mutate(is_same = is_plus_minus(a, b)) %>%
+  pull(is_same) %>%
+  all()
+
+
+
+    fuel_proportions <- benefit %>%
+      filter(vehicle_group == "passenger",
+             fuel_type != "electric",
+             vehicle_age == 0) %>%
+      mutate(count = 1) %>%
+      group_by(fuel_type) %>%
+      summarise(proportion = sum(count)) %>%
+      ungroup() %>%
+      mutate(proportion = proportion / sum(proportion))
 
     #checking petrol vehicles first
     #how do I make it so that they're +/- ~5%????
-  #  expect_equal(
+    expect_equal(
 
-  #    object = fuel_proportions %>%
-  #      filter(fuel_type %in% c("petrol_98", "petrol_95")),
+      object = fuel_proportions %>%
+        filter(fuel_type %in% c("petrol_98", "petrol_95")),
 
-  #    expected = tribble(
-   #     ~fuel_type, ~proportion,
-  #      "petrol_95", premium_95,
-  #      "petrol_98", premium_98
-  #    ))
+      expected = tribble(
+        ~fuel_type, ~proportion,
+        "petrol_95", premium_95,
+        "petrol_98", premium_98
+      ))
 
-  #)}
 
-   # map_dfc(fuel_type_proportion, c("passenger", "lcv", "suv"))
+    expect_equal(#diesel_stuff)
 
-#})
+
+  )}
+
+    map_dfc(fuel_type_proportion, c("passenger", "lcv", "suv"))
+
+})
 
 
 
@@ -129,6 +144,7 @@ test_that("Price data is correct in the final dataset", {
           pull(paste("price", j, sep = "_")) %>%
           round(digits = 2),
 
+
         expected = fuel_prices %>%
           filter(scenario == "central",
                  fuel_type == paste("petrol", j, sep = "_"),
@@ -161,7 +177,6 @@ test_that("Energy consumption and price data is accurate", {
     for (j in c("passenger", "lcv", "suv")) {
 
       expect_equal(
-
         object = benefit_energy %>%
           filter(year == test_year,
                  vehicle_group == j) %>%
@@ -184,7 +199,7 @@ test_that("Energy consumption and price data is accurate", {
 test_that("Overall running costs calculated correctly", {
 
   #Checking the fuel consumption totals are accurate
-  expect_equal(
+  expect_identical(
     object = benefit %>%
       filter(fuel_type != "electric", vehicle_age <= 17) %>%
       mutate(test_consumption = case_when(
@@ -200,9 +215,8 @@ test_that("Overall running costs calculated correctly", {
       rename("test_consumption" = fuel_consumption))
 
 
-
   # Checking the fuel price is correct
-  expect_equal(
+  expect_identical(
   object = benefit %>%
     mutate(test_cost = case_when(
       fuel_type == "electric" ~ energy_price * energy_consumption * km_driven,
@@ -217,6 +231,13 @@ test_that("Overall running costs calculated correctly", {
     select(year, test_cost))
 })
 
+
+
+#WRITE A TEST FOR CO2_TO_FUEL FUNCTIONS
+
+#write some tests where things should break
+
+#test comparing inputs/i.e. fuel price scenario type things
 
 
 

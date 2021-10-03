@@ -281,7 +281,6 @@ benefit_model <- function(.fleet,
 
     #using the difference in running costs to update km travelled with an elasticity of 0.1
     #this assumes a 1% running cost decrease increases driving distance by 0.1%
-    rowwise() %>%
     mutate(rebound_factor = ((1 - (current_cost_100km / base_cost_100km)) * 10) + 100,
            km_driven = km_driven * (rebound_factor / 100))
 
@@ -331,7 +330,6 @@ benefit_model <- function(.fleet,
       vehicle_age == 0 ~ cost,
       vehicle_age != 0 ~ 0
     ))
-
 
 
   return(all_fleet)
