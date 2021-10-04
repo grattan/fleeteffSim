@@ -65,20 +65,19 @@ compliance_costs <- function(.fleet,
 
 
   #we're going to apply the existing technology to the cost curve using the function
-  #add_existing_tech in that script
+  # add_existing_tech in that script
+  .cost_curve_inputs <- tibble(type = c("passenger", "suv", "lcv"),
+                               existing_tech = c(.passenger_existing_tech,
+                                                 .suv_existing_tech,
+                                                 .lcv_existing_tech)
+  )
 
-  .cost_curves <- bind_rows(add_existing_technology(.type = "passenger",
-                                                    .existing_tech = .passenger_existing_tech,
-                                                    .estimate = .cost_curve_estimate,
-                                                    .cost_curves = .cost_curves),
-                            add_existing_technology(.type = "suv",
-                                                    .existing_tech = .suv_existing_tech,
-                                                    .estimate = .cost_curve_estimate,
-                                                    .cost_curves = .cost_curves),
-                            add_existing_technology(.type = "lcv",
-                                                    .existing_tech = .lcv_existing_tech,
-                                                    .estimate = .cost_curve_estimate,
-                                                    .cost_curves = .cost_curves)) %>%
+  .cost_curves <- purrr::map2_dfr(
+    .x = .cost_curve_inputs$type,
+    .y = .cost_curve_inputs$existing_tech,
+    .f = add_existing_technology,
+    .estimate = .cost_curve_estimate,
+    .cost_curves = .cost_curves) %>%
     filter(estimate == .cost_curve_estimate)
 
 
@@ -87,25 +86,16 @@ compliance_costs <- function(.fleet,
   #--------------------------------
   while (.year <= .run_to_year) {
 
+    message(green$bold("\nProcessing ", .year))
+
     #setting the parameters based on the year
     .this_year_fleet <- .fleet %>%
       filter(year == .year)
 
+    #setting the target (or if the target is higher than the BAU, it defaults to the BAU value
+    .this_year_target <- pmin(.target$value[.target$year == .year],
+                              .bau$value[.bau$year == .year])
 
-    #setting the target (or if the target is higher than the BAU, it defaults to the BAU alue
-
-    if(.target %>% filter(year == .year) %>% pull(value)
-       <=
-       .bau %>% filter(year == .year) %>% pull(value)) {
-
-         .this_year_target <- .target %>%
-           filter(year == .year)
-
-    } else {
-      .this_year_target <- .bau %>%
-        filter(year == .year)
-
-       }
 
     #and selecting the cost curves
     .this_year_curves <- .cost_curves %>%
@@ -133,8 +123,6 @@ compliance_costs <- function(.fleet,
       #print(.this_year_fleet)
 
       #tic()
-
-
       .this_year_fleet <- .this_year_fleet %>%
         mutate(
           #updating the current emissions of the car
@@ -166,14 +154,16 @@ compliance_costs <- function(.fleet,
 
 
       #checking if we've reached the target (if not the loop continues running)
-      .target_reached <- (mean(.this_year_fleet$current_emissions) <= .this_year_target$value)
+      .target_reached <- (mean(.this_year_fleet$current_emissions) <= .this_year_target)
 
     }
 
-    message(bold$green("Target reached for year ", .year))
-    message(blue$bold(.year, "average emission value is ", round(mean(.this_year_fleet$current_emissions), digits = 2)))
-    message(blue$bold("The average cost increase per vehicle was $", round(mean(.this_year_fleet$cost), digits = 2)))
-    message(cyan$bold("Moving to next year"))
+
+    mean_emissions <- mean(.this_year_fleet$current_emissions)
+    mean_costs <- mean(.this_year_fleet$cost)
+    message(green("\tTarget reached for year ", .year))
+    message(blue("\tAverage emission value is ", round(mean_emissions, digits = 2)))
+    message(blue("\tAverage cost increase per vehicle was $", round(mean_costs, digits = 2)))
 
     .year <- .year + 1
 
