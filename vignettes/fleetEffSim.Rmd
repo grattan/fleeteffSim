@@ -57,66 +57,19 @@ The remaining chapters dive into the detail of how the inputs to the model were 
 
 # Chapter 1: The long and short of it - using the fleetEffSim model
 
-In it's most simple form, the fleetEffSim model can be run using a single function `fleet_eff_sim()`, which takes arguments to specify each of assumptions the user would like to make. Although in reality the model is broken up into two distinct parts - a 'cost' model, and a 'benefit' model, the `fleet_eff_sim()` function combines the two and produces summarised results of a model run (each of the two parts of the model can be accessed seperately to provide more granular, less summarised outputs. This is discussed in chapter 3). 
 
-This chapter will be brief, but will give an overview of the inputs to the `fleet_eff_sim()` function, as well as the output produced. 
+TBC
 
-
-## Function inputs 
-
-The `fleet_eff_sim()` function takes 27 arguments -- however, all of these arguments have a default specification, and many are unlikely to be changed (provided the user is happy with the assumptions they specify). All arguments are detailed in the function documentation, however some key parameters a user might wish to change are discussed below. 
-
-
-### Using the inbuilt scenarios
-
-Although the `fleet_eff_sim()` takes many arguments, the model can be run most simply by changing very few arguments, particularly if the scenarios used are included in the `fleetEffSim` package. This particularly relates to the targets tested. 
-
-Targets in the `fleet_eff_sim()` function are specified through the `.in_target_file` and `in.target_scenario` arguments. By default, the `.in_target_file` is set to `targets_and_bau` - a \code{tibble} containing 3 target scenarios and one business as usual scenario. The three target scenarios are: target_central, target_linear, and target_ambitious, and the business as usual scenario is called bau. The user can specify which of the scenarios is run in the model through the `.in_target_scenario` variable. By default, the `.in_bau_scenario` is set to the bau scenario in the target input file, and the `.in_target_scenario` argument is set to `target_central`.
-
-For example, to run the linear scenario, the following code could be used:
-
-```{r, eval = FALSE}
-output <- fleet_eff_sim(
-  .in_target_file = targets_and_bau,
-  .in_target_scenario = "target_linear")
-
-```
-
-
-### Evaluating emissions targets that are not included in the fleetEffSim model: the `.in_target_file`, `.in_target_scenario` and `.in_bau_scenario` arguments
-
-Although the `fleet_eff_sim()` model does include three target scenarios, users may wish to test a target that is not include in the default data. This can be done through using the `.in_target_file`, `.in_target_scenario`, and `.in_bau_scenario` arguments. 
-
-The `.in_target_file` can be specified by the user, but must contain:
-
- - three columns, named `year`, `target_type`, and `value`. 
- - a bau and non bau scenario (the bau scenario should be called `bau` under the `target_type` variable) which have equivalent years specified
-
-The `value` argument specifies the emissions target or, for the bau scenario, the expected average emissions for a given year, in gCO2/km.
-
-The user must also specify through the `.in_target_scenario` argument the `target_type` variable of the scenario they would like to run in the model. This is the case regardless of how many scenarios are included in the `.in_target_scenario` file. 
-
-
-
-### Using your own input fleet: `.fleet_creator`, `.input_fleet` and `.in_cars`
-
-The `.fleet_creator` argument defaults to TRUE, and specifies whether the user would like the model to user an inbuilt function `fleet_creator()` to produce a simulated fleet for the model to use (in this case  `.fleet_creator = TRUE`), or whether the user would like to specify their own simulated fleet for the model to use. This might be the case if the user wants to test a scenario where the vehicle sales proportions of different vehicle types (SUVs, passenger vehicles and LCV's) varies from the assumptions built into the `fleet_creator()` function.
-
-In this case, the user should build a simulated fleet to the same specifications are that produced by the `fleet_creator()` function (which can be found by calling `fleet_creator()`). A fleet of 100 cars in the base year is recommended (each 'vehicle' represents 1% of the vehicle fleet). 
-
-The argument `.input_fleet` should be used to specify the users fleet, `.fleet_creator` should be set to FALSE, and the`.in_cars` variable to be set to the number of cars in the users simulated fleet in the base (first) year. 
-
-
-
-
-
-
+![](cost_curves.png)
 
 
 
 # Chapter 2: Inputs to the *fleetEffSim* model
 
 Like any model, the inputs to the *fleetEffSim* model are crucial to understanding what's going on under the hood. This chapter outlines the inputs to the *fleetEffSim* model, with particular attention given to the most significant inputs: the internal combustion engine (ICE) and electric vehicle (EV) cost curves. 
+
+The code developing the inputs to the *fleetEffSim* model is available under the `~data-raw/model_data` file, and are broken up into two subfolders: `costs-inputs` and `benefits-inputs`. As the name suggests, the `cost-inputs` file runs through the creation of the cost curves, as well as te expected business as usual emissions trajectory. The `benefit-inputs` folder includes scripts for some assumptions in the benefit side of the model, including the fuel forecasts, km travelled by vehicles, energy prices, energy intesnity of the grid and EV energy consumption forecasts. 
+
 
 ## What are technology cost curves?
 
@@ -336,11 +289,11 @@ The cost curves discussed earlier in this chapter provide an estimate of the cos
 
 To account for this, an estimate of the existing technology in the Australian vehicle fleet is needed. If this was not account for, technologies may in essence be 'double counted' -- i.e., technology packages may be applied to a vehicle which already has the technology incorporated,providing an upgrade that is lower cost than realistic. 
 
-This issue can also be thought about in terms of where each vehicle 'starts' on the ICE cost curves disussed earlier in this chapter. The *fleetEffSim* model treats existing technology in this way, assuming that the existing technology applied to vehicles is the lowest cost upgrades available. 
+This issue can also be thought about in terms of where each vehicle 'starts' on the ICE cost curves discussed earlier in this chapter. The *fleetEffSim* model treats existing technology in this way, assuming that the existing technology applied to vehicles is the lowest cost upgrades available. 
 
 This assumption is unlikely to necessarily hold true. While some existing technology in vehicles may be at the low point of the, other technologies may reflect consumer preferences for specific engine or transmission technology, or fuel type and drive train. Assuming all existing technology is taken from the lowest points of the cost curves is a highly conservative assumption that is likely to lead to an overestimation of the costs of technology remaining and available to be applied to vehicles to reduce emissions. 
 
-So how do we estimate this 'starting point' in the *fletEffSim* model? 
+So how do we estimate this 'starting point' in the *fleetEffSim* model? 
 
 The technology starting point is first estimated for petrol vehicles, by tracking the changes in emissions since 2008. Given that the base model vehicle assumed in the technology cost curves is approximately equivalent to a vehicle of these specifications, tracking the changes in emissions from 2008 onwards in each vehicle category provides an estimate of the % CO2 reduction already achieved by adding new technologies to the base engine. 
 
@@ -416,7 +369,7 @@ However, many more variables are used as assumptions in the *fleetEffSim* model 
 6. The real world and test cycle emissions 'gap' 
 7. The proportions of vehicles that run on different fuels, including diesel and premium fuels
 
-The assumptions underpinning each of these variables is discussed below. 
+The assumptions underpinning each of these variables is discussed below, and the code used to prepare the data for each assumption is available in the `data-raw/model_data/benefits-inputs` file.
 
 
 
@@ -523,5 +476,108 @@ Although estimates of the gap under the WLTP cycle have a wide range of variabil
 
 
 # Chapter 3: Functions in the fleetEffSim model
+
+Chapter 2 outlined the assumptions used in the *fleetEffSim* model, and how those assumptions were developed. This chapter looks at the model itself, some assumptions that are built into the model, and how the model runs as a whole. 
+
+
+## Structure of the *fleetEffSim* model
+
+As the figure below shows, there are three main functions in the fleetEffSim model: `compliance_costs()`, `benefit_model()` and `generate_results()`. Each function also calls on smaller functions as they run. 
+
+![The structure of the fleetEffSim model](Slide1.png)
+
+
+When put together, a model run may consist of something similar to the following:
+
+```{r, eval = FALSE}
+#First calling the compliance cost function for the target being tested (the central scenario in this case)
+central_compliant <- compliance_costs(.fleet = fleet_creator(),
+                                      .target_scenario = "target_central")
+
+#now running the output of the compliance_cost() function through the benefit_model()
+#function
+
+central_benefit <- benefit_model(.fleet = central_compliant)
+
+#Now similarly calling the compliance cost  and benefit functions for the BAU scenario, as both are required to run the `generate_results()` function:
+
+bau_compliant <- compliance_costs(.fleet = fleet_creator(),
+                                  .target_scenario = "bau")
+
+bau_benefit <- benefit_model(.fleet = bau_compliant)
+
+#Calling the `generate_results()` function to get hte overall results of the target scenario (relative to the BAU scenario)
+
+results <- generate_results(bau_benefits = bau_benefit,
+                            target_benefits = central_benefit,
+                            cars = 100) #this is as fleet_creator() defaults to producing a fleet of 100 cars in the base year
+
+
+```
+
+It's clear that the cost and benefit models are typically run twice - once each for the target scenario being tested, and again for the business as usual scenario to compare this to, and then the results summarised by the generate_results() function. 
+
+This structure is the underlying structure of the `fleet_eff_sim()` function, which simply combines the three functions outlined into a streamlined process to reduce the work required by the user. 
+
+
+
+
+## Compliance costs function
+
+The `compliance_costs()` function aims to determine the lowest cost pathway to achieve a set level of carbon dioxide emissions as specified by the target used as an input. This target could be a policy target, or the business as usual scenario that is expected to occur regardless of policy intervention. 
+
+The `compliance_costs()` function consists of two (or three) main steps:
+
+ 0. We will call this step 0 as it's not technically in the `compliance_cost()` function, but the `fleet_creator()` function is typically used to produce a simulated fleet for the model to use. 
+ 1. The existing level of technology in the simulated fleet is set via the `add_existing_technology()` function. This determines which part of the technology cost curve is available to be applied to new vehicles. 
+ 2. Each year is then looped over, with the `select_upgrade()` function used to select, one at a time, the most cost effective technology option to apply to a vehicle to reduce its CO2 emissions (from the technology cost curves). After each addition, the average emissions of the fleet are calculated and compared to the target value. This loop continues until the target for a given year is met. It then moves to the next year, and repeats. 
+ 
+ 
+ In this way, the `compliance_costs()` function sketches out a lowest cost path to meeting the specified emissions targets within each year. It records the technology added to every simulated vehicle sold in the test period, the costs of all upgrades added to the vehicles, as well as whether an upgrade is to an electric vehicle or not. This output is then directly used in the `benefit_model()` function
+ 
+ 
+ 
+## Benefit model function
+ 
+Once the `compliance_cost()` function has estimated the lowest cost pathway available to meeting emissions for a given set of vehicle sales and emissions targets, this output can be used in the `benefit_model()` function to determine what this means for the vehicles (and users) once they are on the road. In particular, this includes working out how far a given vehicle is likely to drive (based on it's age, type and running costs), how much petrol, diesel or electricity it is likely to use over those kilometres travelled, and the cost associated with that usage. 
+ 
+When run for a target and business as usual scenario, the output can then be used to compare between the two scenarios -- to determine the difference in running costs under a no target and target scenario. 
+ 
+ The `benefit_model()` can be broken into a few steps:
+  1. Assigning fuel types to the vehicles sold
+  2. Simulating the use of each vehicles sold over it's life
+  3. Using the vehicle usage to calculate running costs and emissions
+  
+### Assigning fuel types to the vehicles sold
+
+The vehicles sold in the Australian market are a mix of fuel types - notably between octane 91, 95 and 98 petrol, diesel, and electric. The *fleetEffSim* model assumes that even as many users switch to electric vehicles, the proportions of fuel types in the remaining ICE fleet remain constant. The `benefit_model()` therefore initially seperates the 'electric' and 'non-electric' parts of the fleet, and then applies the existing breakdown between fuel types to the 'non-electric' part of the fleet. 
+
+### Simulating the use of each vehicle sold, over it's lifetime
+
+Now that each vehicle has been assigned a fuel type, the `benefit_model()` function simulates the lifetime of each newly purchased vehicle from the output of the `compliance_cost()` function. This essentially consists of a loop that, for the period specified, sets the conditions and use of a vehicle based on what year it is, and the age/type of vehicle. For exaple, if targets begin in 2024, the year 2024 will be the first year of 'sales'. These vehicles will be 0 years old, and will have characteristics assigned to them based on that age and the fact that the year is 2024. The loop will then continue to 2025, where the vehicles sold in 2024 will have new entires added for their age being 1 - and new vehicles (with age 0) sold in 2025 will be added to the fleet of vehicles on the road. 
+
+In doing this, the model first adds the assumed fuel and electricity prices based on the current year, as well as the assumed energy consumption of electric vehicles and the emissions intensity of the grid. The kilometres driven by each vehicle is then assigned based on the vehicles age and type, and running costs (via a rebound effect). A rebound effect is included to account for the fact that when running costs become cheaper, vehicles tend to be driven further (an elasticity of 0.1 is used). 
+
+### Using vehicle characteristics to calculate running costs and emissions
+
+Once all the vehicle specific characteristics are included, it is reasonably simple to create a series of new columns which calculate the figures we're interested in - running costs and emissions. 
+
+These are calculated based on each vehicle characteristic, and the conversion from emissions data to fuel consumption for each vehicle is calculated through the functions `petrol_co2_to_fuel()` and `diesel_co2_to_fuel()`.
+
+
+## Generate results function
+
+Once the `compliance_costs()` and `benefit_model()` functions have been run for the target and business as usual scenarios, the `generate_results()` function used to compare the two, and calculated the additional costs and benefits under the target scenario. It also applies various discount rates to the data and includes this in the output. 
+
+The `benefit_model()` function first summarises the results of the benefit model for both the target and BAU scenarios, excluding all vehicles that are assumed to be dead (that is vehicles that are over 17 years of age, the assumed vehicle lifetime). It also adjusts the figure to represent the proportions of the real vehicle fleet, as opposed to the simulated fleet. This is done by assuming that the base year (2021, as created by the fleet_creator()) has a real sales figure of approximately 1,100,000 vehicles. As the simulated fleet most commonly used has a set base year number of cars, each therefore represents 1,100,000/(base year fleet size).  
+
+The business as usual scenario is then subtracted from the target scenario to determine the additional benefits of the target policy, and the simplified results are then discounted through the `discount()` function, at three different discount rates.
+
+
+
+
+ 
+
+
 
 

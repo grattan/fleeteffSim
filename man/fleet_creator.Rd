@@ -4,9 +4,9 @@
 \alias{fleet_creator}
 \title{Fleet creator}
 \arguments{
-\item{.i_cars}{The number of cars sold in the base year (2021) in the simulated fleet}
+\item{.i_cars}{The number of cars sold in the base year (2021) in the simulated fleet. Each car represents 10\% of new vehicle sales. Shares from [NTC (p. 23)](https://www.ntc.gov.au/sites/default/files/assets/files/Carbon-dioxide-emissions-intensity-for-new-Australian-light-vehicles-2019.pdf) and scaled to make 100\% by adding in the 5\% to passenger vehicles (the sports/people movers and where they fall) these shares are the 'initial shares' of sales. As the years progress, we get growth across the fleet segments differently according to the growth rates.}
 
-\item{.i_passenger_share}{The share of passenger vehicles in the base year}
+\item{.i_passenger_share}{The share of passenger vehicles in the base year. From these figures, comparing the 2011 and 2019 numbers, we are also going to assume the following about the growth of share of each vehicle type out to 2025 (this gives an overall growth of the fleet around ~1.4\% a year, which is about the long term average (see Australian data [here](https://tradingeconomics.com/australia/total-vehicle-sales).)}
 
 \item{.i_suv_share}{The share of SUVs in the base year}
 
@@ -18,13 +18,11 @@
 
 \item{.lcv_growth}{The growth rate of LCV sales per year}
 
-\item{.passenger_co2}{The assumed average co2 emissions of passenger vehicles in base year}
+\item{.passenger_co2}{The assumed average co2 emissions of passenger vehicles in base year -- the current co2 intensity in each segment these values are calculated from FCAI data - sales weighted averages of emissions in each segment.}
 
 \item{.suv_co2}{The assumed average co2 emissions of SUV vehicles in base year}
 
 \item{.lcv_co2}{The assumed average co2 emissions of LCV vehicles in base year}
-
-\item{.digits}{Used for rounding}
 }
 \value{
 a \code{tibble} with each row representing a vehicle.

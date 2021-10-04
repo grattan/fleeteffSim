@@ -12,6 +12,7 @@
 # First running the functions to get a dataset to work with
 
 compliance <- compliance_costs(.target_scenario = "target_central",
+                               .bau_scenario = "bau",
                                .fleet = fleet_creator(),
                                .penalty_begin = 2025,
                                .run_to_year = 2027)

@@ -22,6 +22,9 @@ is unlikely to yield significantly different results. For example, the BCR in si
 \item{.in_bau_scenario}{Defaults to "bau". The assumed trajectory of the fleet standard from those contained in
 \code{.in_target_file}}
 
+\item{.bau_scenario}{The BAU scenario selected from \code{targets_and_bau} for the compliance cost run. Options include "bau" and "bau_slow".
+"bau" assumes full EV saturation by 2048, whereas "bau_slow" assumes a 2050 emissions value of ~22-23g/km and no EV saturation.}
+
 \item{.in_cost_curves}{Defaults to "cost curves". The assumed costs of improving vehicle efficiency by year and vehicle type.}
 
 \item{.in_cost_curve_estimate}{Defaults to "central". The estimate scenario used from the \code{cost_curves} scenarios. Options are "central",

@@ -29,7 +29,7 @@ plus_minus_one <- function(x, y) {
 test_that("Fleet creation is as expected", {
 
   expect_identical(new_default_fleet,
-                   readr::read_rds("data/fleet-default-original.rds"))
+                   readr::read_rds("tests/testthat/data/fleet-default-original.rds"))
 
   expect_true(between(max(small_fleet$id[small_fleet$year == 2021]), 49, 51))
   expect_true(between(max(big_fleet$id[big_fleet$year == 2021]), 9999, 10001))

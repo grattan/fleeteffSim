@@ -25,6 +25,11 @@
 #' @importFrom dplyr rowwise
 #' @importFrom devtools load_all
 #' @importFrom dplyr pull
+#' @importFrom dplyr across
+#' @importFrom dplyr ungroup
+#' @importFrom dplyr slice
+#' @importFrom data.table fifelse
+#' @importFrom tidyr replace_na
 
 
 
