@@ -18,6 +18,8 @@
 #' \code{.in_target_file}
 #' @param .in_bau_scenario Defaults to "bau". The assumed trajectory of the fleet standard from those contained in
 #' \code{.in_target_file}
+#' @param .bau_scenario The BAU scenario selected from \code{targets_and_bau} for the compliance cost run. Options include "bau" and "bau_slow".
+#' "bau" assumes full EV saturation by 2048, whereas "bau_slow" assumes a 2050 emissions value of ~22-23g/km and no EV saturation.
 #' @param .in_cost_curves Defaults to "cost curves". The assumed costs of improving vehicle efficiency by year and vehicle type.
 #' @param .in_cost_curve_estimate Defaults to "central". The estimate scenario used from the \code{cost_curves} scenarios. Options are "central",
 #' "pp_late", "pp_early".
@@ -130,6 +132,7 @@ fleet_eff_sim <- function(#cost model inputs
   .target_compliant <- compliance_costs(.fleet = .in_fleet,
                                         .target_file = .in_target_file,
                                         .target_scenario = .in_target_scenario,
+                                        .bau_scenario = .in_bau_scenario,
                                         .cost_curves = .in_cost_curves,
                                         .cost_curve_estimate = .in_cost_curves_estimate,
                                         .suv_existing_tech = .in_suv_existing_tech,
@@ -145,6 +148,7 @@ fleet_eff_sim <- function(#cost model inputs
   .bau_compliant <- compliance_costs(.fleet = .in_fleet,
                                         .target_file = .in_target_file,
                                         .target_scenario = .in_bau_scenario,
+                                        .bau_scenario = .in_bau_scenario,
                                         .cost_curves = .in_cost_curves,
                                         .cost_curve_estimate = .in_cost_curves_estimate,
                                         .suv_existing_tech = .in_suv_existing_tech,

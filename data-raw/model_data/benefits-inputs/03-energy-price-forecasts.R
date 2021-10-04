@@ -14,12 +14,12 @@ source("data-raw/model_data/00-setup.R")
 #in our central scenario, we're going to assume that prices remain steady
 #the base electricity cost is taken from (page 4 )
 #https://www.aemc.gov.au/sites/default/files/2020-12/2020%20Residential%20Electricity%20Price%20Trends%20report%20-%2015122020.pdf
-#is assumed to be $0.27/kW in 2021 (base year)
+#is assumed to be $0.25/kW in the 2021-22 FY
 
 energy_cost <- tibble() %>%
   mutate(year = 2021) %>%
   complete(year = (2021:2030)) %>%
-  mutate(energy_price = 0.27)
+  mutate(energy_price = 0.25)
 
 #no we're going to add our change in price through a little function
 
