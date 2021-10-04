@@ -9,6 +9,8 @@
 \item{.target_scenario}{The target type selected from \code{targets_and_bau} for the compliance cost run. Options include
 "target_central", "bau", "target_linear", "target_ambitious".}
 
+\item{.bau_scenario}{The BAU scenario selected from \cote{targets_and_bau} for the compliance cost run. Options include "bau" and "bau_slow". "bau" assumes full EV saturation by 2048, whereas "bau_slow" assumes a 2050 emissions value of ~22-23g/km and no EV saturation.}
+
 \item{.target_file}{The file containing the target scenarios. Should include three columns: `value` (the target emissions), `year`,
 and `target_type`}
 

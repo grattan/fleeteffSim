@@ -7,6 +7,7 @@
 #' @param .fleet The simulated fleet of new vehicle sales. No defaults. Set to \code{.fleet = fleet_crator()} for default fleet assumptions.
 #' @param .target_scenario The target type selected from \code{targets_and_bau} for the compliance cost run. Options include
 #' "target_central", "bau", "target_linear", "target_ambitious".
+#' @param .bau_scenario The BAU scenario selected from \code{targets_and_bau} for the compliance cost run. Options include "bau" and "bau_slow". "bau" assumes full EV saturation by 2048, whereas "bau_slow" assumes a 2050 emissions value of ~22-23g/km and no EV saturation.
 #' @param .target_file The file containing the target scenarios. Should include three columns: `value` (the target emissions), `year`,
 #' and `target_type`
 #' @param .cost_curves The assumed cost curves for al vehicle types
@@ -38,6 +39,7 @@ globalVariables(c("fleet", "target", "cost_curves", "passenger",
 compliance_costs <- function(.fleet,
                              .target_file = targets_and_bau,
                              .target_scenario,
+                             .bau_scenario,
                              .cost_curves = cost_curves,
                              .cost_curve_estimate = "central",
                              .suv_existing_tech = 26,
@@ -53,7 +55,7 @@ compliance_costs <- function(.fleet,
 
   #also selecting the BAU
   .bau <- .target_file %>%
-    filter(target_type == "bau")
+    filter(target_type == .bau_scenario)
 
 
   #in a given year starting at what is set (we'll be looping through years)
