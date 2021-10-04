@@ -145,19 +145,13 @@ compliance_costs <- function(.fleet,
             id == .upgrade$id ~ (.upgrade$type == "ev"),
             id != .upgrade$id ~ electric_applied)
         )
-
       #toc()
-
       #message(bold$blue(.year, " emissions at ", round(mean(.this_year_fleet$current_emissions), digits = 2)))
-
       #message(bold$cyan("Cost at ", round(mean(.this_year_fleet$cost), digits = 2)))
-
-
       #checking if we've reached the target (if not the loop continues running)
       .target_reached <- (mean(.this_year_fleet$current_emissions) <= .this_year_target)
 
     }
-
 
     mean_emissions <- mean(.this_year_fleet$current_emissions)
     mean_costs <- mean(.this_year_fleet$cost)
