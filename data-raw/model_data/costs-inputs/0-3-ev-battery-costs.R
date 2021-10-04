@@ -335,6 +335,28 @@ ev_incremental <- ev_forecast %>%
 
 
 
+
+# Accounting for hard to reach vehicle segments --------------------------------
+
+#Based on reviewer feedback, we are also going add the assumption that many LCV's are
+#hard to reach sectors - that is, even with the cost curves generated, there will remain some
+#loss of utility by switching to EV, or additional cost borne required to purchase an
+#equivalent performance EV.
+
+#To account for this, we will assume that LCV vehicles do not reach price parity within the
+#model sales date. Instead, we assume that the price falls under the given trajectory until it reaches \$1,500
+#shy of price parity. The incremental cost of LCV's are assumed to freeze at this value.
+
+ev_incremental <- ev_incremental %>%
+  mutate(incremental_cost = fifelse(
+    vehicle_group == "lcv" & incremental_cost <= 1500,
+    1500,
+    incremental_cost))
+
+
+
+# Saving data -----------------------------------------------------------------
+
 write_rds(ev_incremental, "data-raw/model_data/temp/ev_cost_curve.rds")
 write_rds(ev_forecast, "data-raw/model_data/temp/ev_forecast.rds")
 
