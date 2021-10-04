@@ -4,7 +4,8 @@ test_that("Compliance cost function doesn't return an error", {
 
   expect_message(compliance_costs(.run_to_year = 2025,
                                   .fleet = fleet_creator(),
-                                  .target_scenario = "target_central"))
+                                  .target_scenario = "target_central",
+                                  .bau_scenario = "bau"))
   })
 
 
@@ -16,7 +17,8 @@ rewrite_compare_objects <- FALSE
 comp_default <- compliance_costs(
   .run_to_year = 2027,
   .fleet = fleet_creator(),
-  .target_scenario = "target_central")
+  .target_scenario = "target_central",
+  .bau_scenario = "bau")
 
 
 if (rewrite_compare_objects) {
@@ -27,13 +29,14 @@ comp_long <- compliance_costs(
   .penalty_begin = 2024,
   .run_to_year = 2050,
   .fleet = fleet_creator(.i_cars = 10),
-  .target_scenario = "target_central")
+  .target_scenario = "target_central",
+  .bau_scenario = "bau")
 
 
 # Run tests  -------------------------------------------------------------------
 test_that("Compliance cost outputs have not changed", {
   expect_identical(comp_default,
-                   readr::read_rds("data/compliance-default-original.rds"))
+                   readr::read_rds("tests/testthat/data/compliance-default-original.rds"))
 
 })
 
@@ -45,7 +48,8 @@ test_that("Targets are met", {
       .penalty_begin = 2024,
       .run_to_year = 2040,
       .fleet = fleet_creator(.i_cars = 10),
-      .target_scenario = t) %>%
+      .target_scenario = t,
+      .bau_scenario = "bau") %>%
       group_by(year) %>%
       summarise(emissions = mean(current_emissions)) %>%
       mutate(target_type = t)
