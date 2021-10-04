@@ -164,10 +164,7 @@ bau_all %>%
 
 #Joining with target estimates --------------------------------------------------
 
-targets <- read_xlsx("data-raw/model_data/targets.xlsx") %>%
-  pivot_longer(cols = (2:4),
-               names_to = "target_type",
-               values_to = "value")
+targets <- read_xlsx("data-raw/model_data/targets.xlsx")
 
 
 targets_and_bau <- bind_rows(targets, bau_all)
