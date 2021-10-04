@@ -147,17 +147,17 @@ generate_results <- function(bau_benefits,
     mutate(scenario = "discount_7_perc")
 
 
-  overall_discounted_3 <- discount(overall_summary, rate = 0.03)
+  overall_discounted_4 <- discount(overall_summary, rate = 0.04)
 
-  overall_discounted_3 <- summarise_fes_results(overall_discounted_3) %>%
-    mutate(scenario = "discount_3_perc")
+  overall_discounted_4 <- summarise_fes_results(overall_discounted_4) %>%
+    mutate(scenario = "discount_4_perc")
 
 
 
 
   #Pooling results --------------------------------------------------------
   result <- bind_rows(overall_discounted_7,
-                      overall_discounted_3,
+                      overall_discounted_4,
                       overall_discounted_0) %>%
     relocate(scenario, abatement_cost) %>%
     pivot_longer(cols = (8:10),

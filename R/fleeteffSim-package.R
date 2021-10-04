@@ -30,6 +30,7 @@
 #' @importFrom dplyr slice
 #' @importFrom data.table fifelse
 #' @importFrom tidyr replace_na
+#' @importFrom purrr as_vector
 
 
 
