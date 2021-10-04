@@ -1,6 +1,4 @@
 
-
-
 # The things we want to test in the benefit model are:
   # the proportions of vehicles by fuel type are right
   # that the km driven by each cars lines up properly
@@ -43,16 +41,7 @@ premium_98 <- 0.05
 
   #fuel_type_proportion <- function(data = benefit, vehicle) {
 
-is_plus_minus <- function(object, target, pm_level = 0.05) {
-  dplyr::between(object, target * (1 - pm_level), target * (1 + pm_level))
-}
-
-data %>%
-  mutate(is_same = is_plus_minus(a, b)) %>%
-  pull(is_same) %>%
-  all()
-
-
+#I don't think this test is finished
 
     fuel_proportions <- benefit %>%
       filter(vehicle_group == "passenger",
@@ -65,27 +54,31 @@ data %>%
       mutate(proportion = proportion / sum(proportion))
 
     #checking petrol vehicles first
-    #how do I make it so that they're +/- ~5%????
-    expect_equal(
+      proportions_actual <- fuel_proportions %>%
+        filter(fuel_type %in% c("petrol_98", "petrol_95"))
 
-      object = fuel_proportions %>%
-        filter(fuel_type %in% c("petrol_98", "petrol_95")),
-
-      expected = tribble(
-        ~fuel_type, ~proportion,
+      proportions_expected <- tribble(
+        ~fuel_type, ~proportion_actual,
         "petrol_95", premium_95,
-        "petrol_98", premium_98
-      ))
+        "petrol_98", premium_98)
 
+      #determining if all are with 5%
+      petrol_porportions <- inner_join(proportions_actual,
+                                       proportions_expected) %>%
+        mutate(test = between(proportion_actual,
+                              proportion - 0.05,
+                              proportion + 0.05))
 
-    expect_equal(#diesel_stuff)
+   test_that("Premium petrol proportions are within accurate range", {
 
-
-  )}
-
-    map_dfc(fuel_type_proportion, c("passenger", "lcv", "suv"))
-
+      #testing that all are true
+      expect_true(
+        petrol_porportions %>%
+          select(test) %>%
+          as_vector() %>%
+          all())
 })
+
 
 
 
