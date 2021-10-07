@@ -65,4 +65,14 @@ fuel_forecasts <- read_xlsx("data-raw/external_data/aip/AIP_Annual_Retail_Price_
                values_to = "price")
 
 
+#however, one things that is not factored into this above data is that fuel prices are expected
+#to rise by approxiamtely 1c/L following the introduction of stricter fuel quality parameters:
+#https://www.industry.gov.au/sites/default/files/2020-07/better-fuel-cleaner-air-ris.pdf page 26
+
+#we will factor that in as well.
+
+fuel_forecasts <- fuel_forecasts %>%
+  mutate(price = price + 0.01)
+
+
 write_rds(fuel_forecasts, "data-raw/model_data/final-data/fuel-forecasts.rds")

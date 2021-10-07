@@ -16,7 +16,7 @@ source("data-raw/model_data/00-setup.R")
 energy_intensity <- read_xlsx("data-raw/external_data/AEMO/emissions-intensity-grid.xlsx",
                               sheet = "step_change") %>%
   clean_names() %>%
-  select(-old) %>%
+  select(-old, step_change) %>%
   complete(year = (2051:2060)) %>%
   arrange(year) %>%
   na.locf()
