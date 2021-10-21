@@ -27,6 +27,6 @@ Technology packages (excluding no 100) must be applied sequentially. Package 100
 cost_curves
 }
 \description{
-The costs and efficiency improvements associated with technology upgrades available to vehicles. Derived from US EPA cost curves as part of the OMEGA model
+The costs and efficiency improvements associated with technology upgrades available to vehicles. Derived from US EPA cost curves used in the OMEGA model.
 }
 \keyword{datasets}

@@ -2,7 +2,7 @@
 #'
 #' @name compliance_costs
 #'
-#' @description Compliance costs
+#' @description A function that estimates the additional production costs of meeting an emissions standard, for a simulated vehicle fleet.
 #'
 #' @param .fleet The simulated fleet of new vehicle sales. No defaults. Set to \code{.fleet = fleet_crator()} for default fleet assumptions.
 #' @param .target_scenario The target type selected from \code{targets_and_bau} for the compliance cost run. Options include

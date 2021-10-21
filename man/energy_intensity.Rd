@@ -5,18 +5,17 @@
 \alias{energy_intensity}
 \title{Energy intensity}
 \format{
-A \code{tibble} object with 3 variables:
+A \code{tibble} object with 2 variables:
 \describe{
 \item{\code{year}}{The year the value applies to}
 \item{\code{ei_g_wh}}{The energy intensity of the grid, in grams carbon dioxide per watt hour from 2021
-to 2060. This is a linear extrapolation of the AEMO "step change" scenario, where it is assumed that
-assumed that net zero is reached by 2050}
+to 2060. }
 }
 }
 \usage{
 energy_intensity
 }
 \description{
-The assumed future energy intensity of the electricity grid
+The assumed future energy intensity of the electricity grid. The data provided is the 'step change' scenario forecast by the Australian Energy Market Operator (AEMO) between 2020 and 2040. It is assumed that after 2040, a linear trajectory to net 0 by 2050 continues.
 }
 \keyword{datasets}

@@ -2,7 +2,7 @@
 
 #' Cost curves
 #'
-#' The costs and efficiency improvements associated with technology upgrades available to vehicles. Derived from US EPA cost curves as part of the OMEGA model
+#' The costs and efficiency improvements associated with technology upgrades available to vehicles. Derived from US EPA cost curves used in the OMEGA model.
 #'
 #' @format A \code{tibble} object with 8 variables:
 #' \describe{
@@ -27,7 +27,7 @@
 
 #' Electricity prices
 #'
-#' The assumed future electricity prices under different scenarios
+#' The assumed future electricity prices under different scenarios.
 #'
 #' @format A \code{tibble} object with 3 variables:
 #' \describe{
@@ -40,12 +40,13 @@
 
 #' Energy consumption
 #'
-#' The assumed future energy consumption of electric vehicles by vehicle type.
+#' The assumed future energy consumption, in kW consumed per kilometer, of electric vehicles by vehicle type. Data is adapted from ICCT data described here:
+#' (https://theicct.org/sites/default/files/publications/EV_cost_2020_2030_20190401.pdf).
 #'
 #' @format A \code{tibble} object with 3 variables:
 #' \describe{
 #' \item{\code{vehicle_type}}{The energy price scenario to be assumed. Options are "central",
-#'  "low_price", "high_price", and "off_peak"}
+#'  "low_price", "high_price", and "off_peak". The central and off-peak scenarios assume a constant electricity price. The low price option assume electricity prices decrease over time, while the high price estimate assumes an increase in prices over time.}
 #' \item{\code{year}}{The year the value applies to}
 #' \item{\code{energy_consumption}}{The assumed energy consumption (kW per kilometre)}
 #' }
@@ -53,21 +54,20 @@
 
 #' Energy intensity
 #'
-#' The assumed future energy intensity of the electricity grid
+#' The assumed future energy intensity of the electricity grid. The data provided is the 'step change' scenario forecast by the Australian Energy Market Operator (AEMO) between 2020 and 2040. It is assumed that after 2040, a linear trajectory to net 0 by 2050 continues.
 #'
-#' @format A \code{tibble} object with 3 variables:
+#' @format A \code{tibble} object with 2 variables:
 #' \describe{
 #' \item{\code{year}}{The year the value applies to}
 #' \item{\code{ei_g_wh}}{The energy intensity of the grid, in grams carbon dioxide per watt hour from 2021
-#' to 2060. This is a linear extrapolation of the AEMO "step change" scenario, where it is assumed that
-#' assumed that net zero is reached by 2050}
+#' to 2060. }
 #' }
 "energy_intensity"
 
 
 #' Fleet
 #'
-#' A simulated fleet of new vehicle sales from 2021 to 2035
+#' A simulated fleet of new vehicle sales from 2021 to 2035, as produced by 'fleet_creator()'. Assumes a default of 100 cars sold in the base year. Each car therefore represents 1\% of new Australian car sales.
 #'
 #' @format A \code{tibble} object with 8 variables:
 #' \describe{
@@ -85,11 +85,11 @@
 #' }
 "fleet"
 
-#' Fuel prices
+#' Fuel prices without taxes
 #'
-#' The assumed future prices of fuels
+#' The assumed future prices of petrol and diesel fuels, excluding taxes.
 #'
-#' @format A \code{tibble} object with 4 variables:
+#' @format A \code{tibble} object containing forecast fuel prices for use in the fleetEffSim model. Fuel prices are base prices only - they do not include fuel excise tax or GST. There are 4 variables:
 #' \describe{
 #' \item{\code{scenario}}{The fuel price scenario to be assumed. Options are "central",
 #' "low_price", "high_price"}
@@ -97,11 +97,26 @@
 #' "petrol_95" and "petrol_98"}
 #' \item{\code{price}}{The assumed future price, excluding all taxes}
 #' }
-"fuel_prices"
+"fuel_prices_no_tax"
+
+#' Fuel prices with taxes
+#'
+#' The assumed future prices of petrol and diesel fuels, including taxes.
+#'
+#' @format  A \code{tibble} object containing forecast fuel prices for use in the fleetEffSim model. Fuel prices are retail prices - they include fuel excise tax and GST. There are 4 variables:
+#' \describe{
+#' \item{\code{scenario}}{The fuel price scenario to be assumed. Options are "central",
+#' "low_price", "high_price"}
+#' \item{\code{fuel_type}}{The type of fuel the cost applies to. Includes "diesel", "petrol_91",
+#' "petrol_95" and "petrol_98"}
+#' \item{\code{price}}{The assumed future price, excluding all taxes}
+#' }
+"fuel_prices_tax"
+
 
 #' KM travelled
 #'
-#' The assumed distance driven in a given year, determined by vehicle type and age
+#' The assumed distance driven in a given year, determined by vehicle type and age. Calculated from the Australian Bureau of Statistics (ABS) Motor Vehicle Use Survey (2016)
 #'
 #' @format A \code{tibble} object with 3 variables:
 #' \describe{

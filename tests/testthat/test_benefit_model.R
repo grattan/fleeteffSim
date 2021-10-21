@@ -1,3 +1,4 @@
+print(getwd())
 
 # The things we want to test in the benefit model are:
   # the proportions of vehicles by fuel type are right
@@ -29,20 +30,6 @@ premium_98 <- 0.05
 
 # Now testing the `benefit` file for the things we described above
 
-#better way to do this will be to check a certain year is correct (based on a random selected variable), and to loop this to repeat ~5 or so times.
-#set the random variable say, for vehicle_age to be between 0 -18 and then pull that km_travelled value from both
-#datasets and compare. Means we don't have to worry about formatting of dataframe. Put that thing in a simple for loop that runs ~5 times.
-
-
-#Checking the proportions of vehicle by fuel type are right
-#THIS TEST CURRENTLY DOESN'T WORK AND IS BROKEN
-#test_that("Checking fuel type proportions are correct", {
-
-
-  #fuel_type_proportion <- function(data = benefit, vehicle) {
-
-#I don't think this test is finished
-
     fuel_proportions <- benefit %>%
       filter(vehicle_group == "passenger",
              fuel_type != "electric",
@@ -63,17 +50,17 @@ premium_98 <- 0.05
         "petrol_98", premium_98)
 
       #determining if all are with 5%
-      petrol_porportions <- inner_join(proportions_actual,
+      petrol_proportions <- inner_join(proportions_actual,
                                        proportions_expected) %>%
         mutate(test = between(proportion_actual,
-                              proportion - 0.05,
-                              proportion + 0.05))
+                              proportion - 0.07,
+                              proportion + 0.07))
 
    test_that("Premium petrol proportions are within accurate range", {
 
       #testing that all are true
       expect_true(
-        petrol_porportions %>%
+        petrol_proportions %>%
           select(test) %>%
           as_vector() %>%
           all())
@@ -139,7 +126,7 @@ test_that("Price data is correct in the final dataset", {
           round(digits = 2),
 
 
-        expected = fuel_prices %>%
+        expected = fuel_prices_tax %>%
           filter(scenario == "central",
                  fuel_type == paste("petrol", j, sep = "_"),
                  year == test_year) %>%
@@ -227,11 +214,6 @@ test_that("Overall running costs calculated correctly", {
 
 
 
-#WRITE A TEST FOR CO2_TO_FUEL FUNCTIONS
-
-#write some tests where things should break
-
-#test comparing inputs/i.e. fuel price scenario type things
 
 
 

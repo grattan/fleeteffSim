@@ -16,6 +16,6 @@ A \code{tibble} object with 3 variables:
 electricity_prices
 }
 \description{
-The assumed future electricity prices under different scenarios
+The assumed future electricity prices under different scenarios.
 }
 \keyword{datasets}

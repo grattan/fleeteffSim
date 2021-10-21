@@ -22,7 +22,7 @@ comp_default <- compliance_costs(
 
 
 if (rewrite_compare_objects) {
-  readr::write_rds(comp_default, "tests/testthat/compliance-default-original.rds")
+  readr::write_rds(comp_default, "compliance-default-original.rds")
 }
 
 comp_long <- compliance_costs(
@@ -36,7 +36,7 @@ comp_long <- compliance_costs(
 # Run tests  -------------------------------------------------------------------
 test_that("Compliance cost outputs have not changed", {
   expect_identical(comp_default,
-                   readr::read_rds("tests/testthat/compliance-default-original.rds"))
+                   readr::read_rds("compliance-default-original.rds"))
 
 })
 

@@ -2,11 +2,11 @@
 #'
 #' @name benefit_model
 #'
-#' @description Benefit model
+#' @description A function that estimates the running costs and carbon emissions of a simulated vehicle fleet, over each vehicles lifetime and expected usage.
 #'
 #' @param .fleet The output of 'compliance_cost' function, with a compliant simulated fleet
 #' @param .km_travelled Defaults to \code{km_travelled}. The assumed distance travelled by each vehicle per year, depending on vehicle age and type.
-#' @param .fuel_prices Defaults to \code{fuel_prices}. The assumed future price of fuel.
+#' @param .fuel_prices Defaults to \code{fuel_prices_tax}. The assumed future price of fuel.
 #' @param .electricity_prices Defaults to \code{electricity_prices}. the assumed future price of electricity.
 #' @param .energy_consumption Defaults to \code{energy_consumption}. The assumed future energy consumption of electric vehicles, in kWh/km travelled.
 #' @param .energy_intensity Defaults to \code{energy_intensity}. The assumed future energy intensity of the electricity grid, in gCO2 equivalent per wH.
@@ -27,7 +27,7 @@
 #'
 
 
-globalVariables(c("compliant_fleet", "km_travelled", "fuel_prices",
+globalVariables(c("compliant_fleet", "km_travelled", "fuel_prices_tax",
                   "electricity_prices", "energy_consumption", "energy_intensity",
                   "year", "fuel_type", "diesel_share", "purchase_year", "price",
                   "vehicle_type", "age", "current_emissions", "total_emissions",
@@ -38,7 +38,7 @@ globalVariables(c("compliant_fleet", "km_travelled", "fuel_prices",
 
 benefit_model <- function(.fleet,
                           .km_travelled = km_travelled,
-                          .fuel_prices = fuel_prices,
+                          .fuel_prices = fuel_prices_tax,
                           .electricity_prices = electricity_prices,
                           .energy_consumption = energy_consumption,
                           .energy_intensity = energy_intensity,

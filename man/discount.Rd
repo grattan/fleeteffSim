@@ -15,5 +15,5 @@ discount(data, rate)
 A discounted dataframe
 }
 \description{
-Apply a discount rate to a supplied dataframe
+Apply a discount rate to a supplied dataframe.
 }

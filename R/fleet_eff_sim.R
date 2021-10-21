@@ -32,7 +32,7 @@
 #' @param .in_run_to_year The year to whih the cost model will simulate.
 #' @param .fleet The simulated fleet with technology upgrades applied to be run through the benefit model.
 #' @param .in_km_travelled Defaults to \code{km_travelled}. The assumed distance travelled by each vehicle per year, depending on vehicle age and type.
-#' @param .in_fuel_prices Defaults to \code{fuel_prices}. The assumed future price of fuel.
+#' @param .in_fuel_prices Defaults to \code{fuel_prices_tax}. The assumed future price of fuel.
 #' @param .in_electricity_prices Defaults to \code{electricity_prices}. the assumed future price of electricity.
 #' @param .in_energy_consumption Defaults to \code{energy_consumption}. The assumed future energy consumption of electric vehicles.
 #' @param .in_energy_intensity Defaults to \code{energy_intensity}. The assumed future energy intensity of the electricity grid.
@@ -78,7 +78,7 @@ fleet_eff_sim <- function(#cost model inputs
                         #benefit model inputs
                         .fleet,
                         .in_km_travelled = km_travelled,
-                        .in_fuel_prices = fuel_prices,
+                        .in_fuel_prices = fuel_prices_tax,
                         .in_electricity_prices = electricity_prices,
                         .in_energy_consumption = energy_consumption,
                         .in_energy_intensity = energy_intensity,

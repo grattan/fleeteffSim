@@ -71,8 +71,12 @@ fuel_forecasts <- read_xlsx("data-raw/external_data/aip/AIP_Annual_Retail_Price_
 
 #we will factor that in as well.
 
-fuel_forecasts <- fuel_forecasts %>%
+fuel_forecasts_no_tax <- fuel_forecasts %>%
   mutate(price = price + 0.01)
 
+#and creating consumer level fuel prices that include the fuel excise tax + GST
+fuel_forecasts_tax <- fuel_forecasts_no_tax %>%
+  mutate(price = (price + 0.427) * 1.1)
 
-write_rds(fuel_forecasts, "data-raw/model_data/final-data/fuel-forecasts.rds")
+write_rds(fuel_forecasts_no_tax, "data-raw/model_data/final-data/fuel-forecasts-no-tax.rds")
+write_rds(fuel_forecasts_tax, "data-raw/model_data/final-data/fuel-forecasts-tax.rds")

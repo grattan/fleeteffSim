@@ -4,15 +4,15 @@
 \alias{generate_results}
 \title{Generate results}
 \arguments{
-\item{bau_benefits}{the bau_benefits data}
+\item{bau_benefits}{The bau scenario output of the benefit_model()}
 
-\item{target_benefits}{the target benefits data}
+\item{target_benefits}{The target scenario output of the benefit_model()}
 
-\item{cars}{the number of cars in the base year of the simulation run}
+\item{cars}{The number of cars in the base year of the simulation run. By default, fleet_creator() sets 100 cars.}
 }
 \value{
 summarised results
 }
 \description{
-Generate results
+Generate summarised and discounted results from a business as usual and target scenario output of the benefit_model().
 }

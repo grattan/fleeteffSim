@@ -16,6 +16,6 @@ A \code{tibble} object with 3 variables:
 km_travelled
 }
 \description{
-The assumed distance driven in a given year, determined by vehicle type and age
+The assumed distance driven in a given year, determined by vehicle type and age. Calculated from the Australian Bureau of Statistics (ABS) Motor Vehicle Use Survey (2016)
 }
 \keyword{datasets}

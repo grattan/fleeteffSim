@@ -2,7 +2,7 @@
 #'
 #' @name discount
 #'
-#' @description Apply a discount rate to a supplied dataframe
+#' @description Apply a discount rate to a supplied dataframe.
 #'
 #' @param data Input data
 #' @param rate Discount rate to be applied
@@ -29,7 +29,7 @@ discount <- function(data, rate) {
 
 
 
-#' @title Summarise FES results
+#' @title Summarise fleetEffSim results from the benefit_model() function.
 #'
 #' @param .data The input data to be summarised
 #'
@@ -72,12 +72,12 @@ summarise_fes_results <- function(.data) {
 #'
 #' @name generate_results
 #'
-#' @description Generate results
+#' @description Generate summarised and discounted results from a business as usual and target scenario output of the benefit_model().
 #'
 #'
-#' @param bau_benefits the bau_benefits data
-#' @param target_benefits the target benefits data
-#' @param cars the number of cars in the base year of the simulation run
+#' @param bau_benefits The bau scenario output of the benefit_model()
+#' @param target_benefits The target scenario output of the benefit_model()
+#' @param cars The number of cars in the base year of the simulation run. By default, fleet_creator() sets 100 cars.
 #'
 #' @return summarised results
 #'

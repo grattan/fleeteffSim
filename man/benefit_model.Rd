@@ -8,7 +8,7 @@
 
 \item{.km_travelled}{Defaults to \code{km_travelled}. The assumed distance travelled by each vehicle per year, depending on vehicle age and type.}
 
-\item{.fuel_prices}{Defaults to \code{fuel_prices}. The assumed future price of fuel.}
+\item{.fuel_prices}{Defaults to \code{fuel_prices_tax}. The assumed future price of fuel.}
 
 \item{.electricity_prices}{Defaults to \code{electricity_prices}. the assumed future price of electricity.}
 
@@ -39,5 +39,5 @@ A \code{tibble} including the fuel, emissions, costs for each vehicle in the sim
 over it' lifespan
 }
 \description{
-Benefit model
+A function that estimates the running costs and carbon emissions of a simulated vehicle fleet, over each vehicles lifetime and expected usage.
 }

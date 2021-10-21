@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate_results.R
 \name{summarise_fes_results}
 \alias{summarise_fes_results}
-\title{Summarise FES results}
+\title{Summarise fleetEffSim results from the benefit_model() function.}
 \usage{
 summarise_fes_results(.data)
 }
@@ -13,5 +13,5 @@ summarise_fes_results(.data)
 A \code{tibble} with summarised results fora given discount rate scenario
 }
 \description{
-Summarise FES results
+Summarise fleetEffSim results from the benefit_model() function.
 }

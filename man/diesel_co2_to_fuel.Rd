@@ -10,8 +10,9 @@ diesel_co2_to_fuel(.co2)
 \item{.co2}{The co2 intensity (g/km) to be converted}
 }
 \value{
-A value of the fuel consumed
+The esimated fuel consumption of the vehicle (L/100km)
 }
 \description{
-diesel_co2_to_fuel
+A function that converts vehicle carbon dioxide emissions (in grams/kilometre) to estimated fuel consumption (in L/100km) for diesel vehicles.
+This is based on data provided by the National Transport Commission (NTC): https://www.ntc.gov.au/sites/default/files/assets/files/Carbon-dioxide-emissions-intensity-for-new-Australian-light-vehicles-2019.pdf
 }

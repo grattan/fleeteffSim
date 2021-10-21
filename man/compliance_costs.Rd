@@ -34,5 +34,5 @@ A \code{tibble} with a 'compliant' vehicle fleet, where technology upgrades have
 applied to meet the specified target in each year
 }
 \description{
-Compliance costs
+A function that estimates the additional production costs of meeting an emissions standard, for a simulated vehicle fleet.
 }

@@ -45,7 +45,7 @@ a I4 petrol engine (assumed as 2008 base model equivalent).}
 
 \item{.in_km_travelled}{Defaults to \code{km_travelled}. The assumed distance travelled by each vehicle per year, depending on vehicle age and type.}
 
-\item{.in_fuel_prices}{Defaults to \code{fuel_prices}. The assumed future price of fuel.}
+\item{.in_fuel_prices}{Defaults to \code{fuel_prices_tax}. The assumed future price of fuel.}
 
 \item{.in_electricity_prices}{Defaults to \code{electricity_prices}. the assumed future price of electricity.}
 

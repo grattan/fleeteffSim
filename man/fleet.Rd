@@ -24,6 +24,6 @@ has applied. This is it's position on the cost curve}
 fleet
 }
 \description{
-A simulated fleet of new vehicle sales from 2021 to 2035
+A simulated fleet of new vehicle sales from 2021 to 2035, as produced by 'fleet_creator()'. Assumes a default of 100 cars sold in the base year. Each car therefore represents 1\% of new Australian car sales.
 }
 \keyword{datasets}

@@ -16,5 +16,5 @@
 A \code{tibble} containing updated cost curves, where the costs of assumed 'existing' technology is 0
 }
 \description{
-Add existing technology
+A function that selects the most cost effective (in $ per grams of CO2 reduced) upgrade to be applied to a new vehicle, from a given vehicle fleet.
 }

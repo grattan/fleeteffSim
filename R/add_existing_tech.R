@@ -2,7 +2,7 @@
 #'
 #' @name add_existing_technology
 #'
-#' @description Add existing technology
+#' @description A function that selects the most cost effective (in $ per grams of CO2 reduced) upgrade to be applied to a new vehicle, from a given vehicle fleet.
 #'
 #' @param .type The type of vehicle (ie. passenger, suv) to be applied to
 #' @param .existing_tech The assumed level of existing technology, as a percentage reduction of co2 since 2008 average
