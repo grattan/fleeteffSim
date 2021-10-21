@@ -24,7 +24,6 @@ Imports:
     testthat,
     magrittr,
     ggplot2,
-    grattantheme,
     devtools,
     purrr
 Depends: 
