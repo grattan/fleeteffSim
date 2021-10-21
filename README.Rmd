@@ -46,8 +46,67 @@ remotes::install_github("grattan/fleeteffSim")
 
 ## Example
 
-```{r example}
+The `fleet_eff_sim()` function runs simulations of vehicle emissions standards over the Australian fleet. By default, this uses a grattan trajectory listed in the 'Grattan car plan' report as the 'central' scenario, and simulates the use of vehicles sold between 2024 and 2050. 
+
+```{r example, message = FALSE}
+
 library(fleeteffSim)
 ## basic example code
+
+test_run <- fleet_eff_sim()
+```
+
+The resulting `tibble` is:
+
+``` {r glimpse}
+
+glimpse(test_run)
+
+```
+
+There are many inputs to the `fleet_eff_sim()` function that can be changed from default settings. For example, this includes future fuel and electricity prices, as well as forecast future sales volumes by vehicle category. 
+
+
+The `fleet_eff_sim()` function only provides summarised data over the entire period run in the model. 
+For more granular output, the following series of functions can be run. 
+
+First, production costs required to meet targets can be estimated:
+
+``` {r compliance}
+
+#Running the target scenario to estimate vehicle production costs
+target_compliance <- compliance_costs(fleet = fleet_creator(),
+                                      .target_scenario = "target_central")
+
+#Running the 'business as usual'  scenario to estimate vehicle production costs
+bau_compliance <- compliance_costs(fleet = fleet_creator(),
+                                   .target_scenario = "bau")
+
+```
+
+
+Second, running costs and emissions can be estimated:
+
+``` {r compliance}
+
+#Running the target scenario to estimate vehicle production costs
+target_running <- benefit_model(fleet = target_compliance)
+
+#Running the 'business as usual'  scenario to estimate vehicle production costs
+bau_running <- benefit_model(fleet = bau_compliance)
+
+```
+
+
+The `target_running` and `bau_running` datasets can then be compared for more granular data - however, it must be considered that each 'simulated' vehicle under default parameters accounts for 1\% of the total estimated fleet. Thus, runnings costs and emissions must be scaled up respectively to estimated fleet wide values. 
+
+Similarly to the `fleet_eff_sim()` function, summarised results can also be generated. This accounts for scaling up the fleet:
+
+``` {r summary}
+
+generate_results(bau_benefits = bau_running,
+                 target_benefits = target_running,
+                 cars = 100)
+
 ```
 

@@ -29,7 +29,7 @@
 #' a I4 petrol engine (assumed as 2008 base model equivalent)
 #' @param .in_lcv_existing_tech Defaults to 13 The percentage assumed efficiency improvement of a base model new LCV vehicle when compared to
 #' a I4 petrol engine (assumed as 2008 base model equivalent).
-#' @param .in_run_to_year The year to whih the cost model will simulate.
+#' @param .in_run_to_year Defaults to 2050. The year to whih the cost model will simulate.
 #' @param .fleet The simulated fleet with technology upgrades applied to be run through the benefit model.
 #' @param .in_km_travelled Defaults to \code{km_travelled}. The assumed distance travelled by each vehicle per year, depending on vehicle age and type.
 #' @param .in_fuel_prices Defaults to \code{fuel_prices_tax}. The assumed future price of fuel.
